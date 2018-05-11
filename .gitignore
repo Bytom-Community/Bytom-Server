@@ -11,3 +11,12 @@
 
 # log files for monitoring or debugging
 *.log
+
+# ====> iOS Code
+# OS X
+.DS_Store
+# Xcode
+build/
+*.pbxuser
+xcuserdata/
+*.xccheckout

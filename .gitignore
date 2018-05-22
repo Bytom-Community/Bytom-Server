@@ -15,6 +15,7 @@
 # ====> iOS Code
 # OS X
 .DS_Store
+.idea
 # Xcode
 build/
 *.pbxuser

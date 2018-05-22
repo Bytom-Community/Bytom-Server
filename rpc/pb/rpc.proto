@@ -1,0 +1,40 @@
+syntax = "proto3";
+package rpcpb;
+
+import "google/api/annotations.proto";
+
+
+message NonParamsRequest {
+}
+
+message CreateKeyRequest {
+    string alias = 1;
+    string password = 2;
+}
+
+message CreateKeyResponse {
+    string alias = 1;
+    string xpub = 2;
+}
+
+message ListKeyResponse {
+    repeated CreateKeyResponse keys = 1;
+}
+
+
+service ApiService {
+    // Key
+    rpc CreateKey(CreateKeyRequest) returns (CreateKeyResponse) {
+        option (google.api.http) = {
+            post: "/v1/create-key"
+            body: "*"
+        };
+    }
+
+    rpc ListKey(NonParamsRequest) returns (ListKeyResponse) {
+        option (google.api.http) = {
+            post: "/v1/list-keys"
+            body: "*"
+        };
+    }
+}

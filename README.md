@@ -15,9 +15,30 @@ RPC协议端口：9889
 ## 安装依赖
 #### 安装protobuf 3.4.0
 [protobuf download](https://github.com/google/protobuf/releases)
+``` bash
+./configure
+make
+make install
+protoc —version
+```
+
+#### 安装grpc和grpc-gateway插件
+``` bash
+export PATH=$PATH:$GOPATH/bin
+go get -u google.golang.org/grpc
+go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
+go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+go get -u github.com/golang/protobuf/protoc-gen-go
+```
 
 #### 安装java和android版本插件
 [安装protoc-gen-grpc-java](https://github.com/grpc/grpc-java/tree/master/compiler)
+``` bash
+git clone https://github.com/grpc/grpc-java.git
+cd grpc-java/compiler
+../gradlew java_pluginExecutable
+cp build/exe/java_plugin/protoc-gen-grpc-java $GOPATH/bin
+```
 
 ## 下载bytom
 ``` bash
@@ -71,7 +92,7 @@ $ make bytomd    # build bytomd
 ```bash
 $ cd ./cmd/bytomd
 $ ./bytomd init --chain_id testnet
-$ ./bytomd node -web.closed
+$ ./bytomd node --web.closed
 ```
 
 ## 使用SDK RPC协议创建/遍历/删除key
@@ -87,7 +108,7 @@ import (
 )
 
 func main() {
-	address := "0.0.0.0:9889"
+	address := "localhost:9889"
 
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {

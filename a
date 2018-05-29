@@ -1,8 +1,0 @@
-echo "Building php sdk to sdk dir"
-mkdir -p sdk/php_bytom
-protoc -I/usr/local/include -I. \
--I${GOPATH}/src \
--I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
---plugin=grpc_php_plugin \
---php_out==./sdk/php_bytom \
-./rpc/pb/*.proto

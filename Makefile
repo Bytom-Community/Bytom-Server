@@ -60,7 +60,7 @@ sdk:
 	protoc -I/usr/local/include -I. \
 	-I${GOPATH}/src \
 	-I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
-	--plugin=protoc-gen-grpc-java=${GOPATH}/src/github.com/grpc/grpc-java/compiler/build/exe/java_plugin/protoc-gen-grpc-java \
+	--plugin=protoc-gen-grpc-java:. \
 	--grpc-java_out=lite:./sdk/java_bytom \
 	./rpc/pb/*.proto
 
@@ -69,7 +69,7 @@ sdk:
 	protoc -I/usr/local/include -I. \
 	-I${GOPATH}/src \
 	-I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
-	--plugin=protoc-gen-grpc-java=${GOPATH}/src/github.com/grpc/grpc-java/compiler/build/exe/java_plugin/protoc-gen-grpc-java \
+	--plugin=protoc-gen-grpc-java:. \
 	--grpc-java_out=nano:./sdk/android_bytom \
 	./rpc/pb/*.proto
 

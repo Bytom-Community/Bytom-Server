@@ -31,13 +31,21 @@ go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 go get -u github.com/golang/protobuf/protoc-gen-go
 ```
 
-#### 安装java和android版本插件
+#### 安装生成java和android SDK插件
 [安装protoc-gen-grpc-java](https://github.com/grpc/grpc-java/tree/master/compiler)
 ``` bash
 git clone https://github.com/grpc/grpc-java.git
 cd grpc-java/compiler
 ../gradlew java_pluginExecutable
 cp build/exe/java_plugin/protoc-gen-grpc-java $GOPATH/bin
+```
+
+#### 安装生成python SDK插件
+``` bash
+pip install --upgrade pip
+pip install grpcio
+pip install grpcio-tools
+pip install google-cloud-translate // google.api
 ```
 
 ## 下载bytom
@@ -95,7 +103,7 @@ $ ./bytomd init --chain_id testnet
 $ ./bytomd node --web.closed
 ```
 
-## 使用SDK RPC协议创建/遍历/删除key
+## 使用GO SDK RPC协议创建/遍历/删除key
 ``` golang
 package main
 
@@ -149,6 +157,29 @@ func main() {
 	}
 }
 
+```
+
+### 使用Python SDK RPC协议
+``` bash
+#!/usr/bin/python
+
+from __future__ import print_function
+
+import grpc
+
+import rpc_pb2
+import rpc_pb2_grpc
+
+
+def run():
+    channel = grpc.insecure_channel('localhost:9889')
+    stub = rpc_pb2_grpc.ApiServiceStub(channel)
+    response = stub.GetState(rpc_pb2.NonParamsRequest())
+    print("client received: ", response)
+
+
+if __name__ == '__main__':
+    run()
 ```
 
 ## 使用http协议创建/遍历/删除key

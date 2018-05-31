@@ -48,10 +48,10 @@ sdk:
 
 	@echo "Building python sdk to sdk dir"
 	@mkdir -p sdk/py_bytom
-	protoc -I/usr/local/include -I. \
-	-I$(GOPATH)/src \
-	-I$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
-	--plugin=grpc_python_plugin \
+	python -m grpc_tools.protoc -I/usr/local/include -I. \
+	-I${GOPATH}/src \
+	-I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+	--grpc_python_out=./sdk/py_bytom \
 	--python_out=./sdk/py_bytom \
 	./rpc/pb/*.proto
 

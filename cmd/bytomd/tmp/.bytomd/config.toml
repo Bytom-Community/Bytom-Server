@@ -1,9 +1,0 @@
-# This is a TOML config file.
-# For more information, see https://github.com/toml-lang/toml
-fast_sync = true
-db_backend = "leveldb"
-api_addr = "0.0.0.0:9888"
-chain_id = "testnet"
-[p2p]
-laddr = "tcp://0.0.0.0:46656"
-seeds = "172.104.224.219:46656,198.74.61.131:46656,212.111.41.245:46656"

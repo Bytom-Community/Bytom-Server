@@ -39,6 +39,24 @@ message ResetKeyPasswordResponse {
     bool changed = 1;
 }
 
+message Action {
+    string type = 1;
+    string assetID = 2;
+    string assetAlias = 3;
+    string accountID = 4;
+    string accountAlias =5;
+}
+
+message BuildTransactionRequest {
+    repeated Action actions = 1;
+    int64 ttl = 2;
+    uint64 timeRange = 3;
+}
+
+message BuildTransactionResponse {
+    string template = 1;
+}
+
 service ApiService {
     // state
     rpc GetState (NonParamsRequest) returns (GetStateResponse) {
@@ -72,6 +90,13 @@ service ApiService {
     rpc ResetKeyPassword(ResetKeyPasswordRequest) returns (ResetKeyPasswordResponse) {
         option (google.api.http) = {
             post: "/v1/reset-key-password"
+            body: "*"
+        };
+    }
+
+    rpc BuildTransaction(BuildTransactionRequest) return (BuildTransactionResponse) {
+        option (google.api.http) = {
+            post: "/v1/build-transaction"
             body: "*"
         };
     }

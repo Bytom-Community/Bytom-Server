@@ -29,6 +29,16 @@ message DeleteKeyRequest {
     string xpub = 2;
 }
 
+messge ResetKeyPasswordRequest {
+    string xpub = 1;
+    string oldPassword = 2;
+    string newPassword = 3;
+}
+
+messge ResetKeyPasswordResponse {
+    bool changed = 1;
+}
+
 service ApiService {
     // state
     rpc GetState (NonParamsRequest) returns (GetStateResponse) {
@@ -57,5 +67,12 @@ service ApiService {
             post: "/v1/delete-keys"
             body: "*"
         };
+    }
+
+    rpc ResetKeyPassword(ResetKeyPasswordRequest) returns (ResetKeyPasswordResponse) {
+        option (google.api.http) = {
+            post: "/v1/reset-key-password"
+            body: "*"
+        }
     }
 }

@@ -36,3 +36,16 @@ func (s *ApiService) DeleteKey(ctx context.Context, req *rpcpb.DeleteKeyRequest)
 	}
 	return &empty.Empty{}, nil
 }
+
+func (s *ApiService) ResetKeyPassword(ctx context.Context, req *rpcpb.ResetKeyRequest) (*rpcpb.ResetKeyPasswordResponse, error) {
+	xpub := new(chainkd.XPub)
+	if err := xpub.UnmarshalText([]byte(req.Xpub)); err != nil {
+		return nil, fmt.Errorf("reset-key-password: %v", err.Error())
+	}
+
+	if err := s.wallet.Hsm.ResetPassword(*xpub, req.OldPassword, req.NewPassword); err != nil {
+		return nil, err
+	}
+	changed := true
+	return &rpcpb.ResetKeyPasswordResponse{Changed: changed}, nil
+}

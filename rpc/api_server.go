@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/bytom/protocol"
+	"github.com/bytom/rpc/pb"
 	"github.com/bytom/wallet"
 )
 

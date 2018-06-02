@@ -29,13 +29,13 @@ message DeleteKeyRequest {
     string xpub = 2;
 }
 
-messge ResetKeyPasswordRequest {
+message ResetKeyPasswordRequest {
     string xpub = 1;
     string oldPassword = 2;
     string newPassword = 3;
 }
 
-messge ResetKeyPasswordResponse {
+message ResetKeyPasswordResponse {
     bool changed = 1;
 }
 
@@ -73,6 +73,6 @@ service ApiService {
         option (google.api.http) = {
             post: "/v1/reset-key-password"
             body: "*"
-        }
+        };
     }
 }

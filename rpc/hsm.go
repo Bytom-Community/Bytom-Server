@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/bytom/crypto/ed25519/chainkd"
+	"github.com/bytom/rpc/pb"
+	"github.com/bytom/util"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
@@ -37,7 +39,7 @@ func (s *ApiService) DeleteKey(ctx context.Context, req *rpcpb.DeleteKeyRequest)
 	return &empty.Empty{}, nil
 }
 
-func (s *ApiService) ResetKeyPassword(ctx context.Context, req *rpcpb.ResetKeyRequest) (*rpcpb.ResetKeyPasswordResponse, error) {
+func (s *ApiService) ResetKeyPassword(ctx context.Context, req *rpcpb.ResetKeyPasswordRequest) (*rpcpb.ResetKeyPasswordResponse, error) {
 	xpub := new(chainkd.XPub)
 	if err := xpub.UnmarshalText([]byte(req.Xpub)); err != nil {
 		return nil, fmt.Errorf("reset-key-password: %v", err.Error())

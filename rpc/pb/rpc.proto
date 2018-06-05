@@ -39,22 +39,12 @@ message ResetKeyPasswordResponse {
     bool changed = 1;
 }
 
-message Action {
-    string type = 1;
-    string assetID = 2;
-    string assetAlias = 3;
-    string accountID = 4;
-    string accountAlias =5;
+message SubmitTransactionRequest {
+    string rawTransaction = 1;
 }
 
-message BuildTransactionRequest {
-    repeated Action actions = 1;
-    int64 ttl = 2;
-    uint64 timeRange = 3;
-}
-
-message BuildTransactionResponse {
-    string template = 1;
+message SubmitTransactionResponse {
+    string txID = 1;
 }
 
 service ApiService {
@@ -94,9 +84,9 @@ service ApiService {
         };
     }
 
-    rpc BuildTransaction(BuildTransactionRequest) return (BuildTransactionResponse) {
+    rpc SubmitTransaction(SubmitTransactionRequest) returns (SubmitTransactionResponse) {
         option (google.api.http) = {
-            post: "/v1/build-transaction"
+            post: "/v1/submit-transaction"
             body: "*"
         };
     }

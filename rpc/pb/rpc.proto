@@ -55,6 +55,14 @@ message ListAssetsResponse {
     repeated string assets = 1;
 }
 
+message ListBalancesRequest {
+    string accountID = 1;
+}
+
+message ListBalancesResponse {
+    repeated string balances = 1;
+}
+
 service ApiService {
     // state
     rpc GetState (NonParamsRequest) returns (GetStateResponse) {
@@ -102,6 +110,13 @@ service ApiService {
     rpc ListAssets(ListAssetsRequest) returns (ListAssetsResponse) {
         option (google.api.http) = {
             post: "/v1/list-assets"
+            body: "*"
+        };
+    }
+
+    rpc ListBalances(ListAssetsRequest) returns (ListAssetsResponse) {
+        option (google.api.http) = {
+            post: "/v1/list-balances"
             body: "*"
         };
     }

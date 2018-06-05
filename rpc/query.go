@@ -22,3 +22,18 @@ func (s *ApiService) ListAssets(ctx context.Context, req *rpcpb.ListAssetsReques
 
 	return &rpcpb.ListAssetsResponse{Assets: results}, nil
 }
+
+func (s *ApiService) ListBalances(ctx context.Context, req *rpcpb.ListBanlancesRequest) (*rpcpb.ListBanlancesResponse, error) {
+	accountID := req.AccountID
+	balances, err := s.wallet.GetAccountBalances(accountID)
+	if err != nil {
+		return nil, fmt.Errorf("list-balances: %v", err.Error())
+	}
+
+	var results []string
+	for _, balance := range balances {
+		results = append(results, string(util.JsonEncode(balance)))
+	}
+
+	return &rpcpb.ListBalancesResponse{Balances: results}, nil
+}

@@ -23,22 +23,22 @@ var (
 
 func (s *ApiService) SubmitTransaction(ctx context.Context, req *rpcpb.SubmitTransactionRequest) (*rpcpb.SubmitTransactionResponse, error) {
 	rawTx := new(types.Tx)
-	if err := rawTx.UnmarshalText([]byte(req.RawTranstraction)); err != nil {
+	if err := rawTx.UnmarshalText([]byte(req.RawTransaction)); err != nil {
 		return nil, fmt.Errorf("submit-transaction: %v", err.Error())
 	}
 	if err := txbuilder.FinalizeTx(ctx, s.chain, rawTx); err != nil {
 		return nil, fmt.Errorf("submit-transaction: %v", err.Error())
 	}
-	return &rpcpb.SubmitTransactionResponse{TxID: rawTx.ID}, nil
+	return &rpcpb.SubmitTransactionResponse{TxID: rawTx.ID.String()}, nil
 }
 
 func (s *ApiService) EstimateTransactionGas(ctx context.Context, req *rpcpb.EstimateTransactionGasRequest) (*rpcpb.EstimateTransactionGasResponse, error) {
 	txTemplate := new(txbuilder.Template)
-	if err := json.Unmarshal(req.TxTemplate, txTemplate); err != nil {
+	if err := json.Unmarshal([]byte(req.TxTemplate), txTemplate); err != nil {
 		return nil, fmt.Errorf("estimate-transaction-gas: %v", err.Error())
 	}
 
-	txGasResp, err := EstimateTxGas(txTemplate)
+	txGasResp, err := EstimateTxGas(*txTemplate)
 	if err != nil {
 		return nil, fmt.Errorf("estimate-transaction-gas: %v", err.Error())
 	}

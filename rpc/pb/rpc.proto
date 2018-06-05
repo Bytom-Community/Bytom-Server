@@ -134,7 +134,7 @@ service ApiService {
         };
     }
 
-    rpc ListBalances(ListAssetsRequest) returns (ListAssetsResponse) {
+    rpc ListBalances(ListBalancesRequest) returns (ListBalancesResponse) {
         option (google.api.http) = {
             post: "/v1/list-balances"
             body: "*"

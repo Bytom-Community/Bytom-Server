@@ -24,7 +24,7 @@ func (s *ApiService) ListAssets(ctx context.Context, req *rpcpb.ListAssetsReques
 	return &rpcpb.ListAssetsResponse{Assets: results}, nil
 }
 
-func (s *ApiService) ListBalances(ctx context.Context, req *rpcpb.ListBanlancesRequest) (*rpcpb.ListBanlancesResponse, error) {
+func (s *ApiService) ListBalances(ctx context.Context, req *rpcpb.ListBalancesRequest) (*rpcpb.ListBalancesResponse, error) {
 	accountID := req.AccountID
 	balances, err := s.wallet.GetAccountBalances(accountID)
 	if err != nil {

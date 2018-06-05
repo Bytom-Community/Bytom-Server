@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/bytom/blockchain/query"
 	"github.com/bytom/rpc/pb"
 	"github.com/bytom/util"
 )
@@ -36,4 +37,36 @@ func (s *ApiService) ListBalances(ctx context.Context, req *rpcpb.ListBanlancesR
 	}
 
 	return &rpcpb.ListBalancesResponse{Balances: results}, nil
+}
+
+func (s *ApiService) ListTransactions(ctx context.Context, req *rpcpb.ListTransactionsRequest) (*rpcpb.ListTransactionsResponse, error) {
+	txID := req.TxID
+	accountID := req.AccountID
+	detail := req.Detail
+	transactions := []*query.AnnotatedTx{}
+	var err error
+	var results []string
+
+	if accountID != "" {
+		transactions, err = s.wallet.GetTransactionsByAccountID(accountID)
+	} else {
+		transactions, err = s.wallet.GetTransactionsByTxID(txID)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("list-transactions: %v", err.Error())
+	}
+
+	if detail == false {
+		txSummaries := s.wallet.GetTransactionsSummary(transactions)
+		for _, txSum := range txSummaries {
+			results = append(results, string(util.JsonEncode(txSum)))
+		}
+		return &rpcpb.ListTransactionsResponse{Transactions: results}, nil
+	}
+
+	for _, trans := range transactions {
+		results = append(results, string(util.JsonEncode(trans)))
+	}
+	return &rpcpb.ListTransactionsResponse{Transactions: results}, nil
 }

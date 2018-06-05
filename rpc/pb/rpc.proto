@@ -47,6 +47,14 @@ message SubmitTransactionResponse {
     string txID = 1;
 }
 
+message ListAssetsRequest {
+    string assetID = 1;
+}
+
+message ListAssetsResponse {
+    repeated string assets = 1;
+}
+
 service ApiService {
     // state
     rpc GetState (NonParamsRequest) returns (GetStateResponse) {
@@ -87,6 +95,13 @@ service ApiService {
     rpc SubmitTransaction(SubmitTransactionRequest) returns (SubmitTransactionResponse) {
         option (google.api.http) = {
             post: "/v1/submit-transaction"
+            body: "*"
+        };
+    }
+
+    rpc ListAssets(ListAssetsRequest) returns (ListAssetsResponse) {
+        option (google.api.http) = {
+            post: "/v1/list-assets"
             body: "*"
         };
     }

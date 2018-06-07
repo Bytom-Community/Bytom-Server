@@ -29,6 +29,60 @@ message DeleteKeyRequest {
     string xpub = 2;
 }
 
+message ResetKeyPasswordRequest {
+    string xpub = 1;
+    string oldPassword = 2;
+    string newPassword = 3;
+}
+
+message ResetKeyPasswordResponse {
+    bool changed = 1;
+}
+
+message SubmitTransactionRequest {
+    string rawTransaction = 1;
+}
+
+message SubmitTransactionResponse {
+    string txID = 1;
+}
+
+message ListAssetsRequest {
+    string assetID = 1;
+}
+
+message ListAssetsResponse {
+    repeated string assets = 1;
+}
+
+message ListBalancesRequest {
+    string accountID = 1;
+}
+
+message ListBalancesResponse {
+    repeated string balances = 1;
+}
+
+message ListTransactionsRequest {
+    string txID = 1;
+    string accountID = 2;
+    bool detail = 3;
+}
+
+message ListTransactionsResponse {
+    repeated string transactions = 1;
+}
+
+message EstimateTransactionGasRequest {
+    string txTemplate = 1;
+}
+
+message EstimateTransactionGasResponse {
+    int64 totalNeu = 1;
+    int64 storageNeu = 2;
+    int64 vmNeu = 3; 
+}
+
 service ApiService {
     // state
     rpc GetState (NonParamsRequest) returns (GetStateResponse) {
@@ -55,6 +109,48 @@ service ApiService {
     rpc DeleteKey(DeleteKeyRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             post: "/v1/delete-keys"
+            body: "*"
+        };
+    }
+
+    rpc ResetKeyPassword(ResetKeyPasswordRequest) returns (ResetKeyPasswordResponse) {
+        option (google.api.http) = {
+            post: "/v1/reset-key-password"
+            body: "*"
+        };
+    }
+
+    rpc SubmitTransaction(SubmitTransactionRequest) returns (SubmitTransactionResponse) {
+        option (google.api.http) = {
+            post: "/v1/submit-transaction"
+            body: "*"
+        };
+    }
+
+    rpc ListAssets(ListAssetsRequest) returns (ListAssetsResponse) {
+        option (google.api.http) = {
+            post: "/v1/list-assets"
+            body: "*"
+        };
+    }
+
+    rpc ListBalances(ListBalancesRequest) returns (ListBalancesResponse) {
+        option (google.api.http) = {
+            post: "/v1/list-balances"
+            body: "*"
+        };
+    }
+
+    rpc ListTransactions(ListTransactionsRequest) returns (ListTransactionsResponse) {
+        option (google.api.http) = {
+            post: "/v1/list-transactions"
+            body: "*"
+        };
+    }
+
+    rpc EstimateTransactionGas(EstimateTransactionGasRequest) returns (EstimateTransactionGasResponse) {
+        option (google.api.http) = {
+            post: "/v1/estimate-transaction-gas"
             body: "*"
         };
     }

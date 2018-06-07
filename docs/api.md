@@ -66,7 +66,7 @@ assets: [
 #### 查询资产交易记录
 | URL | Method | Version |
 |-------|:------------:|:------------:|
-| /v1/list-balances | POST | V1 |
+| /v1/list-transactions | POST | V1 |
 
 **Parameters:**
 ``` json
@@ -81,6 +81,7 @@ assets: [
 transactions: [
     {
         "tx_id":        string
+        "confirmation": int64
         "block_time":   int64
         "block_hash":   string
         "block_height": int

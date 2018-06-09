@@ -48,11 +48,11 @@ message SubmitTransactionResponse {
 }
 
 message ListAssetsRequest {
-    string assetID = 1;
+    string address = 1;
 }
 
 message ListAssetsResponse {
-    repeated string assets = 1;
+    string assets = 1;
 }
 
 message ListBalancesRequest {

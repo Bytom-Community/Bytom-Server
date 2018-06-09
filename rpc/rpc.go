@@ -5,14 +5,16 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/bytom/wallet"
-	"github.com/bytom/protocol"
-	cfg "github.com/bytom/config"
-	"github.com/bytom/rpc/pb"
+	"github.com/bytom/chaincache"
 
+	cfg "github.com/bytom/config"
+	"github.com/bytom/protocol"
+	"github.com/bytom/rpc/pb"
+	"github.com/bytom/wallet"
+
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	log "github.com/sirupsen/logrus"
 	cmn "github.com/tendermint/tmlibs/common"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -23,16 +25,15 @@ type Rpc struct {
 	rpcListen string
 }
 
-func NewRpc(wallet *wallet.Wallet,chain *protocol.Chain, config *cfg.Config) *Rpc  {
+func NewRpc(wallet *wallet.Wallet, chain *protocol.Chain, config *cfg.Config) *Rpc {
 	rpcServer := grpc.NewServer()
 	rpc := &Rpc{
-		rpcServer:rpcServer,
+		rpcServer: rpcServer,
 	}
 
 	api := &ApiService{
-		rpcServer:rpc,
-		wallet: wallet,
-		chain: chain,
+		rpcServer:  rpc,
+		chainCache: chaincache.NewChainCache(nil, nil, nil),
 	}
 
 	rpcpb.RegisterApiServiceServer(rpcServer, api)
@@ -49,7 +50,7 @@ func (r *Rpc) Start(api_addr, rpc_addr string) error {
 		log.WithField("RPC start on address:", rpc_addr).Info("Rpc listen")
 		listener, err := net.Listen("tcp", rpc_addr)
 		if err != nil {
-			cmn.Exit(cmn.Fmt("RPC Failed to listen tcp port: %v, err:%v",rpc_addr, err))
+			cmn.Exit(cmn.Fmt("RPC Failed to listen tcp port: %v, err:%v", rpc_addr, err))
 		}
 		if err = r.rpcServer.Serve(listener); err != nil {
 			cmn.Exit(cmn.Fmt("RPC Failed to serve tcp port: %v, err:%v", rpc_addr, err))
@@ -76,11 +77,10 @@ func (r *Rpc) Start(api_addr, rpc_addr string) error {
 		}
 	}()
 
-
 	return nil
 }
 
-func (r *Rpc) Stop()  {
+func (r *Rpc) Stop() {
 	log.WithField("RPC stop on address:", r.rpcListen).Info("Rpc listen")
 	log.WithField("API stop on address:", r.apiListen).Info("API listen")
 	r.rpcServer.Stop()

@@ -12,6 +12,7 @@ import (
 	"github.com/bytom/consensus/segwit"
 	"github.com/bytom/errors"
 	"github.com/bytom/math/checked"
+	"github.com/bytom/protocol/bc/types"
 	"github.com/bytom/rpc/pb"
 )
 
@@ -20,18 +21,19 @@ var (
 	defaultBaseRate = float64(100000)
 )
 
+// SubmitTransaction submit transaction
 func (s *ApiService) SubmitTransaction(ctx context.Context, req *rpcpb.SubmitTransactionRequest) (*rpcpb.SubmitTransactionResponse, error) {
-	// rawTx := new(types.Tx)
-	// if err := rawTx.UnmarshalText([]byte(req.RawTransaction)); err != nil {
-	// 	return nil, fmt.Errorf("submit-transaction: %v", err.Error())
-	// }
-	// if err := txbuilder.FinalizeTx(ctx, s.chain, rawTx); err != nil {
-	// 	return nil, fmt.Errorf("submit-transaction: %v", err.Error())
-	// }
-	// return &rpcpb.SubmitTransactionResponse{TxID: rawTx.ID.String()}, nil
-	return nil, nil
+	rawTx := new(types.Tx)
+	if err := rawTx.UnmarshalText([]byte(req.RawTransaction)); err != nil {
+		return nil, fmt.Errorf("submit-transaction: %v", err.Error())
+	}
+	if err := txbuilder.FinalizeTx(ctx, s.chainCache.GetChain(), rawTx); err != nil {
+		return nil, fmt.Errorf("submit-transaction: %v", err.Error())
+	}
+	return &rpcpb.SubmitTransactionResponse{TxID: rawTx.ID.String()}, nil
 }
 
+// EstimateTransactionGas estimate transaction gas
 func (s *ApiService) EstimateTransactionGas(ctx context.Context, req *rpcpb.EstimateTransactionGasRequest) (*rpcpb.EstimateTransactionGasResponse, error) {
 	txTemplate := new(txbuilder.Template)
 	if err := json.Unmarshal([]byte(req.TxTemplate), txTemplate); err != nil {

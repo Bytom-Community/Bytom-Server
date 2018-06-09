@@ -183,3 +183,7 @@ func (c *ChainCache) FindAccountByAlias(ctx context.Context, alias string) (*acc
 	}
 	return acc, nil
 }
+
+func (c *ChainCache) GetChain() *protocol.Chain {
+	return c.chain
+}

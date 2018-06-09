@@ -1,8 +1,12 @@
 package chaincache
 
 import (
+	"context"
 	"sync"
 
+	"github.com/bytom/account"
+
+	"github.com/bytom/asset"
 	"github.com/bytom/blockchain/query"
 	"github.com/bytom/database/leveldb"
 	"github.com/bytom/protocol"
@@ -10,9 +14,10 @@ import (
 	"github.com/bytom/protocol/bc/types"
 	w "github.com/bytom/wallet"
 
+	"time"
+
 	log "github.com/sirupsen/logrus"
 	cmn "github.com/tendermint/tmlibs/common"
-	"time"
 )
 
 type ChainCache struct {
@@ -161,4 +166,20 @@ func (c *ChainCache) Close() {
 	close(c.exitCh)
 	c.BlockChain = []*types.Block{}
 	c.TransactionsOutputs = make(map[bc.Hash][]*query.AnnotatedOutput)
+}
+
+func (c *ChainCache) FindAssetByAlias(alias string) (*asset.Asset, error) {
+	asset, err := c.wallet.AssetReg.FindByAlias(alias)
+	if err != nil {
+		return nil, err
+	}
+	return asset, nil
+}
+
+func (c *ChainCache) FindAccountByAlias(ctx context.Context, alias string) (*account.Account, error) {
+	acc, err := c.wallet.AccountMgr.FindByAlias(ctx, alias)
+	if err != nil {
+		return nil, err
+	}
+	return acc, nil
 }

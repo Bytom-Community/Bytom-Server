@@ -132,6 +132,7 @@ func (c *ChainCache) ListTransaction(txID string) map[string]interface{} {
 	var TX = make(map[string]interface{})
 	c.RLock()
 	defer c.RUnlock()
+exit:
 	for _, block := range c.BlockChain {
 		for _, tx := range block.Transactions {
 			var inputs = []*query.AnnotatedInput{}
@@ -148,7 +149,7 @@ func (c *ChainCache) ListTransaction(txID string) map[string]interface{} {
 				TX["block"] = block
 				TX["inputs"] = inputs
 				TX["outputs"] = outputs
-				break
+				break exit
 			}
 		}
 	}

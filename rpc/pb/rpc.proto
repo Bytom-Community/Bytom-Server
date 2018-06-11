@@ -2,7 +2,7 @@ syntax = "proto3";
 package rpcpb;
 
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
+// import "google/protobuf/empty.proto";
 
 message NonParamsRequest {
 }
@@ -11,33 +11,33 @@ message GetStateResponse {
     string status = 1;
 }
 
-message CreateKeyRequest {
-    string alias = 1;
-    string password = 2;
-}
+// message CreateKeyRequest {
+//     string alias = 1;
+//     string password = 2;
+// }
 
-message CreateKeyResponse {
-    string xpub = 1;
-}
+// message CreateKeyResponse {
+//     string xpub = 1;
+// }
 
-message ListKeyResponse {
-    repeated string xpub = 1;
-}
+// message ListKeyResponse {
+//     repeated string xpub = 1;
+// }
 
-message DeleteKeyRequest {
-    string password = 1;
-    string xpub = 2;
-}
+// message DeleteKeyRequest {
+//     string password = 1;
+//     string xpub = 2;
+// }
 
-message ResetKeyPasswordRequest {
-    string xpub = 1;
-    string oldPassword = 2;
-    string newPassword = 3;
-}
+// message ResetKeyPasswordRequest {
+//     string xpub = 1;
+//     string oldPassword = 2;
+//     string newPassword = 3;
+// }
 
-message ResetKeyPasswordResponse {
-    bool changed = 1;
-}
+// message ResetKeyPasswordResponse {
+//     bool changed = 1;
+// }
 
 message SubmitTransactionRequest {
     string rawTransaction = 1;
@@ -48,11 +48,11 @@ message SubmitTransactionResponse {
 }
 
 message ListAssetsRequest {
-    string assetID = 1;
+    string address = 1;
 }
 
 message ListAssetsResponse {
-    repeated string assets = 1;
+    string assets = 1;
 }
 
 message ListBalancesRequest {
@@ -64,13 +64,20 @@ message ListBalancesResponse {
 }
 
 message ListTransactionsRequest {
-    string txID = 1;
-    string accountID = 2;
-    bool detail = 3;
+    string address = 1;
+    string assetID = 2;
 }
 
 message ListTransactionsResponse {
     repeated string transactions = 1;
+}
+
+message ListTransactionRequest {
+    string txID = 1;
+}
+
+message ListTransactionResponse {
+    string tx = 1;
 }
 
 message EstimateTransactionGasRequest {
@@ -84,41 +91,41 @@ message EstimateTransactionGasResponse {
 }
 
 service ApiService {
-    // state
+    // // state
     rpc GetState (NonParamsRequest) returns (GetStateResponse) {
         option (google.api.http) = {
             get: "/v1/state"
         };
     }
 
-    // Key
-    rpc CreateKey(CreateKeyRequest) returns (CreateKeyResponse) {
-        option (google.api.http) = {
-            post: "/v1/create-key"
-            body: "*"
-        };
-    }
+    // // Key
+    // rpc CreateKey(CreateKeyRequest) returns (CreateKeyResponse) {
+    //     option (google.api.http) = {
+    //         post: "/v1/create-key"
+    //         body: "*"
+    //     };
+    // }
 
-    rpc ListKey(NonParamsRequest) returns (ListKeyResponse) {
-        option (google.api.http) = {
-            post: "/v1/list-keys"
-            body: "*"
-        };
-    }
+    // rpc ListKey(NonParamsRequest) returns (ListKeyResponse) {
+    //     option (google.api.http) = {
+    //         post: "/v1/list-keys"
+    //         body: "*"
+    //     };
+    // }
 
-    rpc DeleteKey(DeleteKeyRequest) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            post: "/v1/delete-keys"
-            body: "*"
-        };
-    }
+    // rpc DeleteKey(DeleteKeyRequest) returns (google.protobuf.Empty) {
+    //     option (google.api.http) = {
+    //         post: "/v1/delete-keys"
+    //         body: "*"
+    //     };
+    // }
 
-    rpc ResetKeyPassword(ResetKeyPasswordRequest) returns (ResetKeyPasswordResponse) {
-        option (google.api.http) = {
-            post: "/v1/reset-key-password"
-            body: "*"
-        };
-    }
+    // rpc ResetKeyPassword(ResetKeyPasswordRequest) returns (ResetKeyPasswordResponse) {
+    //     option (google.api.http) = {
+    //         post: "/v1/reset-key-password"
+    //         body: "*"
+    //     };
+    // }
 
     rpc SubmitTransaction(SubmitTransactionRequest) returns (SubmitTransactionResponse) {
         option (google.api.http) = {
@@ -151,6 +158,13 @@ service ApiService {
     rpc EstimateTransactionGas(EstimateTransactionGasRequest) returns (EstimateTransactionGasResponse) {
         option (google.api.http) = {
             post: "/v1/estimate-transaction-gas"
+            body: "*"
+        };
+    }
+
+    rpc ListTransaction(ListTransactionRequest) returns (ListTransactionResponse) {
+        option (google.api.http) = {
+            post: "/v1/list-transactions"
             body: "*"
         };
     }

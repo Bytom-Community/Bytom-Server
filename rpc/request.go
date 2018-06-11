@@ -35,7 +35,7 @@ func (s *ApiService) filterAliases(ctx context.Context, br *BuildRequest) error 
 			case consensus.BTMAlias:
 				m["asset_id"] = consensus.BTMAssetID.String()
 			default:
-				asset, err := s.wallet.AssetReg.FindByAlias(alias)
+				asset, err := s.chainCache.FindAssetByAlias(alias)
 				if err != nil {
 					return errors.WithDetailf(err, "invalid asset alias %s on action %d", alias, i)
 				}
@@ -46,7 +46,7 @@ func (s *ApiService) filterAliases(ctx context.Context, br *BuildRequest) error 
 		id, _ = m["account_id"].(string)
 		alias, _ = m["account_alias"].(string)
 		if id == "" && alias != "" {
-			acc, err := s.wallet.AccountMgr.FindByAlias(ctx, alias)
+			acc, err := s.chainCache.FindAccountByAlias(ctx, alias)
 			if err != nil {
 				return errors.WithDetailf(err, "invalid account alias %s on action %d", alias, i)
 			}

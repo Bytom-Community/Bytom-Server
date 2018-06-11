@@ -6,7 +6,6 @@ package rpcpb
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import empty "github.com/golang/protobuf/ptypes/empty"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 
 import (
@@ -35,7 +34,7 @@ func (m *NonParamsRequest) Reset()         { *m = NonParamsRequest{} }
 func (m *NonParamsRequest) String() string { return proto.CompactTextString(m) }
 func (*NonParamsRequest) ProtoMessage()    {}
 func (*NonParamsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{0}
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{0}
 }
 func (m *NonParamsRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_NonParamsRequest.Unmarshal(m, b)
@@ -66,7 +65,7 @@ func (m *GetStateResponse) Reset()         { *m = GetStateResponse{} }
 func (m *GetStateResponse) String() string { return proto.CompactTextString(m) }
 func (*GetStateResponse) ProtoMessage()    {}
 func (*GetStateResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{1}
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{1}
 }
 func (m *GetStateResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetStateResponse.Unmarshal(m, b)
@@ -93,266 +92,6 @@ func (m *GetStateResponse) GetStatus() string {
 	return ""
 }
 
-type CreateKeyRequest struct {
-	Alias                string   `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
-	Password             string   `protobuf:"bytes,2,opt,name=password" json:"password,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *CreateKeyRequest) Reset()         { *m = CreateKeyRequest{} }
-func (m *CreateKeyRequest) String() string { return proto.CompactTextString(m) }
-func (*CreateKeyRequest) ProtoMessage()    {}
-func (*CreateKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{2}
-}
-func (m *CreateKeyRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CreateKeyRequest.Unmarshal(m, b)
-}
-func (m *CreateKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CreateKeyRequest.Marshal(b, m, deterministic)
-}
-func (dst *CreateKeyRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CreateKeyRequest.Merge(dst, src)
-}
-func (m *CreateKeyRequest) XXX_Size() int {
-	return xxx_messageInfo_CreateKeyRequest.Size(m)
-}
-func (m *CreateKeyRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_CreateKeyRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_CreateKeyRequest proto.InternalMessageInfo
-
-func (m *CreateKeyRequest) GetAlias() string {
-	if m != nil {
-		return m.Alias
-	}
-	return ""
-}
-
-func (m *CreateKeyRequest) GetPassword() string {
-	if m != nil {
-		return m.Password
-	}
-	return ""
-}
-
-type CreateKeyResponse struct {
-	Xpub                 string   `protobuf:"bytes,1,opt,name=xpub" json:"xpub,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *CreateKeyResponse) Reset()         { *m = CreateKeyResponse{} }
-func (m *CreateKeyResponse) String() string { return proto.CompactTextString(m) }
-func (*CreateKeyResponse) ProtoMessage()    {}
-func (*CreateKeyResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{3}
-}
-func (m *CreateKeyResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CreateKeyResponse.Unmarshal(m, b)
-}
-func (m *CreateKeyResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CreateKeyResponse.Marshal(b, m, deterministic)
-}
-func (dst *CreateKeyResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CreateKeyResponse.Merge(dst, src)
-}
-func (m *CreateKeyResponse) XXX_Size() int {
-	return xxx_messageInfo_CreateKeyResponse.Size(m)
-}
-func (m *CreateKeyResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_CreateKeyResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_CreateKeyResponse proto.InternalMessageInfo
-
-func (m *CreateKeyResponse) GetXpub() string {
-	if m != nil {
-		return m.Xpub
-	}
-	return ""
-}
-
-type ListKeyResponse struct {
-	Xpub                 []string `protobuf:"bytes,1,rep,name=xpub" json:"xpub,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *ListKeyResponse) Reset()         { *m = ListKeyResponse{} }
-func (m *ListKeyResponse) String() string { return proto.CompactTextString(m) }
-func (*ListKeyResponse) ProtoMessage()    {}
-func (*ListKeyResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{4}
-}
-func (m *ListKeyResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ListKeyResponse.Unmarshal(m, b)
-}
-func (m *ListKeyResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ListKeyResponse.Marshal(b, m, deterministic)
-}
-func (dst *ListKeyResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListKeyResponse.Merge(dst, src)
-}
-func (m *ListKeyResponse) XXX_Size() int {
-	return xxx_messageInfo_ListKeyResponse.Size(m)
-}
-func (m *ListKeyResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListKeyResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListKeyResponse proto.InternalMessageInfo
-
-func (m *ListKeyResponse) GetXpub() []string {
-	if m != nil {
-		return m.Xpub
-	}
-	return nil
-}
-
-type DeleteKeyRequest struct {
-	Password             string   `protobuf:"bytes,1,opt,name=password" json:"password,omitempty"`
-	Xpub                 string   `protobuf:"bytes,2,opt,name=xpub" json:"xpub,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *DeleteKeyRequest) Reset()         { *m = DeleteKeyRequest{} }
-func (m *DeleteKeyRequest) String() string { return proto.CompactTextString(m) }
-func (*DeleteKeyRequest) ProtoMessage()    {}
-func (*DeleteKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{5}
-}
-func (m *DeleteKeyRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DeleteKeyRequest.Unmarshal(m, b)
-}
-func (m *DeleteKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DeleteKeyRequest.Marshal(b, m, deterministic)
-}
-func (dst *DeleteKeyRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeleteKeyRequest.Merge(dst, src)
-}
-func (m *DeleteKeyRequest) XXX_Size() int {
-	return xxx_messageInfo_DeleteKeyRequest.Size(m)
-}
-func (m *DeleteKeyRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeleteKeyRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DeleteKeyRequest proto.InternalMessageInfo
-
-func (m *DeleteKeyRequest) GetPassword() string {
-	if m != nil {
-		return m.Password
-	}
-	return ""
-}
-
-func (m *DeleteKeyRequest) GetXpub() string {
-	if m != nil {
-		return m.Xpub
-	}
-	return ""
-}
-
-type ResetKeyPasswordRequest struct {
-	Xpub                 string   `protobuf:"bytes,1,opt,name=xpub" json:"xpub,omitempty"`
-	OldPassword          string   `protobuf:"bytes,2,opt,name=oldPassword" json:"oldPassword,omitempty"`
-	NewPassword          string   `protobuf:"bytes,3,opt,name=newPassword" json:"newPassword,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *ResetKeyPasswordRequest) Reset()         { *m = ResetKeyPasswordRequest{} }
-func (m *ResetKeyPasswordRequest) String() string { return proto.CompactTextString(m) }
-func (*ResetKeyPasswordRequest) ProtoMessage()    {}
-func (*ResetKeyPasswordRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{6}
-}
-func (m *ResetKeyPasswordRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ResetKeyPasswordRequest.Unmarshal(m, b)
-}
-func (m *ResetKeyPasswordRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ResetKeyPasswordRequest.Marshal(b, m, deterministic)
-}
-func (dst *ResetKeyPasswordRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ResetKeyPasswordRequest.Merge(dst, src)
-}
-func (m *ResetKeyPasswordRequest) XXX_Size() int {
-	return xxx_messageInfo_ResetKeyPasswordRequest.Size(m)
-}
-func (m *ResetKeyPasswordRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ResetKeyPasswordRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ResetKeyPasswordRequest proto.InternalMessageInfo
-
-func (m *ResetKeyPasswordRequest) GetXpub() string {
-	if m != nil {
-		return m.Xpub
-	}
-	return ""
-}
-
-func (m *ResetKeyPasswordRequest) GetOldPassword() string {
-	if m != nil {
-		return m.OldPassword
-	}
-	return ""
-}
-
-func (m *ResetKeyPasswordRequest) GetNewPassword() string {
-	if m != nil {
-		return m.NewPassword
-	}
-	return ""
-}
-
-type ResetKeyPasswordResponse struct {
-	Changed              bool     `protobuf:"varint,1,opt,name=changed" json:"changed,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *ResetKeyPasswordResponse) Reset()         { *m = ResetKeyPasswordResponse{} }
-func (m *ResetKeyPasswordResponse) String() string { return proto.CompactTextString(m) }
-func (*ResetKeyPasswordResponse) ProtoMessage()    {}
-func (*ResetKeyPasswordResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{7}
-}
-func (m *ResetKeyPasswordResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ResetKeyPasswordResponse.Unmarshal(m, b)
-}
-func (m *ResetKeyPasswordResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ResetKeyPasswordResponse.Marshal(b, m, deterministic)
-}
-func (dst *ResetKeyPasswordResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ResetKeyPasswordResponse.Merge(dst, src)
-}
-func (m *ResetKeyPasswordResponse) XXX_Size() int {
-	return xxx_messageInfo_ResetKeyPasswordResponse.Size(m)
-}
-func (m *ResetKeyPasswordResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ResetKeyPasswordResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ResetKeyPasswordResponse proto.InternalMessageInfo
-
-func (m *ResetKeyPasswordResponse) GetChanged() bool {
-	if m != nil {
-		return m.Changed
-	}
-	return false
-}
-
 type SubmitTransactionRequest struct {
 	RawTransaction       string   `protobuf:"bytes,1,opt,name=rawTransaction" json:"rawTransaction,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -364,7 +103,7 @@ func (m *SubmitTransactionRequest) Reset()         { *m = SubmitTransactionReque
 func (m *SubmitTransactionRequest) String() string { return proto.CompactTextString(m) }
 func (*SubmitTransactionRequest) ProtoMessage()    {}
 func (*SubmitTransactionRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{8}
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{2}
 }
 func (m *SubmitTransactionRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubmitTransactionRequest.Unmarshal(m, b)
@@ -402,7 +141,7 @@ func (m *SubmitTransactionResponse) Reset()         { *m = SubmitTransactionResp
 func (m *SubmitTransactionResponse) String() string { return proto.CompactTextString(m) }
 func (*SubmitTransactionResponse) ProtoMessage()    {}
 func (*SubmitTransactionResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{9}
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{3}
 }
 func (m *SubmitTransactionResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubmitTransactionResponse.Unmarshal(m, b)
@@ -430,7 +169,7 @@ func (m *SubmitTransactionResponse) GetTxID() string {
 }
 
 type ListAssetsRequest struct {
-	AssetID              string   `protobuf:"bytes,1,opt,name=assetID" json:"assetID,omitempty"`
+	Address              string   `protobuf:"bytes,1,opt,name=address" json:"address,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -440,7 +179,7 @@ func (m *ListAssetsRequest) Reset()         { *m = ListAssetsRequest{} }
 func (m *ListAssetsRequest) String() string { return proto.CompactTextString(m) }
 func (*ListAssetsRequest) ProtoMessage()    {}
 func (*ListAssetsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{10}
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{4}
 }
 func (m *ListAssetsRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListAssetsRequest.Unmarshal(m, b)
@@ -460,15 +199,15 @@ func (m *ListAssetsRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ListAssetsRequest proto.InternalMessageInfo
 
-func (m *ListAssetsRequest) GetAssetID() string {
+func (m *ListAssetsRequest) GetAddress() string {
 	if m != nil {
-		return m.AssetID
+		return m.Address
 	}
 	return ""
 }
 
 type ListAssetsResponse struct {
-	Assets               []string `protobuf:"bytes,1,rep,name=assets" json:"assets,omitempty"`
+	Assets               string   `protobuf:"bytes,1,opt,name=assets" json:"assets,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -478,7 +217,7 @@ func (m *ListAssetsResponse) Reset()         { *m = ListAssetsResponse{} }
 func (m *ListAssetsResponse) String() string { return proto.CompactTextString(m) }
 func (*ListAssetsResponse) ProtoMessage()    {}
 func (*ListAssetsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{11}
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{5}
 }
 func (m *ListAssetsResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListAssetsResponse.Unmarshal(m, b)
@@ -498,11 +237,11 @@ func (m *ListAssetsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ListAssetsResponse proto.InternalMessageInfo
 
-func (m *ListAssetsResponse) GetAssets() []string {
+func (m *ListAssetsResponse) GetAssets() string {
 	if m != nil {
 		return m.Assets
 	}
-	return nil
+	return ""
 }
 
 type ListBalancesRequest struct {
@@ -516,7 +255,7 @@ func (m *ListBalancesRequest) Reset()         { *m = ListBalancesRequest{} }
 func (m *ListBalancesRequest) String() string { return proto.CompactTextString(m) }
 func (*ListBalancesRequest) ProtoMessage()    {}
 func (*ListBalancesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{12}
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{6}
 }
 func (m *ListBalancesRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListBalancesRequest.Unmarshal(m, b)
@@ -554,7 +293,7 @@ func (m *ListBalancesResponse) Reset()         { *m = ListBalancesResponse{} }
 func (m *ListBalancesResponse) String() string { return proto.CompactTextString(m) }
 func (*ListBalancesResponse) ProtoMessage()    {}
 func (*ListBalancesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{13}
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{7}
 }
 func (m *ListBalancesResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListBalancesResponse.Unmarshal(m, b)
@@ -582,9 +321,8 @@ func (m *ListBalancesResponse) GetBalances() []string {
 }
 
 type ListTransactionsRequest struct {
-	TxID                 string   `protobuf:"bytes,1,opt,name=txID" json:"txID,omitempty"`
-	AccountID            string   `protobuf:"bytes,2,opt,name=accountID" json:"accountID,omitempty"`
-	Detail               bool     `protobuf:"varint,3,opt,name=detail" json:"detail,omitempty"`
+	Address              string   `protobuf:"bytes,1,opt,name=address" json:"address,omitempty"`
+	AssetID              string   `protobuf:"bytes,2,opt,name=assetID" json:"assetID,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -594,7 +332,7 @@ func (m *ListTransactionsRequest) Reset()         { *m = ListTransactionsRequest
 func (m *ListTransactionsRequest) String() string { return proto.CompactTextString(m) }
 func (*ListTransactionsRequest) ProtoMessage()    {}
 func (*ListTransactionsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{14}
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{8}
 }
 func (m *ListTransactionsRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListTransactionsRequest.Unmarshal(m, b)
@@ -614,25 +352,18 @@ func (m *ListTransactionsRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ListTransactionsRequest proto.InternalMessageInfo
 
-func (m *ListTransactionsRequest) GetTxID() string {
+func (m *ListTransactionsRequest) GetAddress() string {
 	if m != nil {
-		return m.TxID
+		return m.Address
 	}
 	return ""
 }
 
-func (m *ListTransactionsRequest) GetAccountID() string {
+func (m *ListTransactionsRequest) GetAssetID() string {
 	if m != nil {
-		return m.AccountID
+		return m.AssetID
 	}
 	return ""
-}
-
-func (m *ListTransactionsRequest) GetDetail() bool {
-	if m != nil {
-		return m.Detail
-	}
-	return false
 }
 
 type ListTransactionsResponse struct {
@@ -646,7 +377,7 @@ func (m *ListTransactionsResponse) Reset()         { *m = ListTransactionsRespon
 func (m *ListTransactionsResponse) String() string { return proto.CompactTextString(m) }
 func (*ListTransactionsResponse) ProtoMessage()    {}
 func (*ListTransactionsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{15}
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{9}
 }
 func (m *ListTransactionsResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListTransactionsResponse.Unmarshal(m, b)
@@ -673,6 +404,82 @@ func (m *ListTransactionsResponse) GetTransactions() []string {
 	return nil
 }
 
+type ListTransactionRequest struct {
+	TxID                 string   `protobuf:"bytes,1,opt,name=txID" json:"txID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListTransactionRequest) Reset()         { *m = ListTransactionRequest{} }
+func (m *ListTransactionRequest) String() string { return proto.CompactTextString(m) }
+func (*ListTransactionRequest) ProtoMessage()    {}
+func (*ListTransactionRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{10}
+}
+func (m *ListTransactionRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListTransactionRequest.Unmarshal(m, b)
+}
+func (m *ListTransactionRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListTransactionRequest.Marshal(b, m, deterministic)
+}
+func (dst *ListTransactionRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListTransactionRequest.Merge(dst, src)
+}
+func (m *ListTransactionRequest) XXX_Size() int {
+	return xxx_messageInfo_ListTransactionRequest.Size(m)
+}
+func (m *ListTransactionRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListTransactionRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListTransactionRequest proto.InternalMessageInfo
+
+func (m *ListTransactionRequest) GetTxID() string {
+	if m != nil {
+		return m.TxID
+	}
+	return ""
+}
+
+type ListTransactionResponse struct {
+	Tx                   string   `protobuf:"bytes,1,opt,name=tx" json:"tx,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListTransactionResponse) Reset()         { *m = ListTransactionResponse{} }
+func (m *ListTransactionResponse) String() string { return proto.CompactTextString(m) }
+func (*ListTransactionResponse) ProtoMessage()    {}
+func (*ListTransactionResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{11}
+}
+func (m *ListTransactionResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListTransactionResponse.Unmarshal(m, b)
+}
+func (m *ListTransactionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListTransactionResponse.Marshal(b, m, deterministic)
+}
+func (dst *ListTransactionResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListTransactionResponse.Merge(dst, src)
+}
+func (m *ListTransactionResponse) XXX_Size() int {
+	return xxx_messageInfo_ListTransactionResponse.Size(m)
+}
+func (m *ListTransactionResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListTransactionResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListTransactionResponse proto.InternalMessageInfo
+
+func (m *ListTransactionResponse) GetTx() string {
+	if m != nil {
+		return m.Tx
+	}
+	return ""
+}
+
 type EstimateTransactionGasRequest struct {
 	TxTemplate           string   `protobuf:"bytes,1,opt,name=txTemplate" json:"txTemplate,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -684,7 +491,7 @@ func (m *EstimateTransactionGasRequest) Reset()         { *m = EstimateTransacti
 func (m *EstimateTransactionGasRequest) String() string { return proto.CompactTextString(m) }
 func (*EstimateTransactionGasRequest) ProtoMessage()    {}
 func (*EstimateTransactionGasRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{16}
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{12}
 }
 func (m *EstimateTransactionGasRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EstimateTransactionGasRequest.Unmarshal(m, b)
@@ -724,7 +531,7 @@ func (m *EstimateTransactionGasResponse) Reset()         { *m = EstimateTransact
 func (m *EstimateTransactionGasResponse) String() string { return proto.CompactTextString(m) }
 func (*EstimateTransactionGasResponse) ProtoMessage()    {}
 func (*EstimateTransactionGasResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rpc_9a8374e6f0412a34, []int{17}
+	return fileDescriptor_rpc_a87e4a92f82d64fe, []int{13}
 }
 func (m *EstimateTransactionGasResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EstimateTransactionGasResponse.Unmarshal(m, b)
@@ -768,12 +575,6 @@ func (m *EstimateTransactionGasResponse) GetVmNeu() int64 {
 func init() {
 	proto.RegisterType((*NonParamsRequest)(nil), "rpcpb.NonParamsRequest")
 	proto.RegisterType((*GetStateResponse)(nil), "rpcpb.GetStateResponse")
-	proto.RegisterType((*CreateKeyRequest)(nil), "rpcpb.CreateKeyRequest")
-	proto.RegisterType((*CreateKeyResponse)(nil), "rpcpb.CreateKeyResponse")
-	proto.RegisterType((*ListKeyResponse)(nil), "rpcpb.ListKeyResponse")
-	proto.RegisterType((*DeleteKeyRequest)(nil), "rpcpb.DeleteKeyRequest")
-	proto.RegisterType((*ResetKeyPasswordRequest)(nil), "rpcpb.ResetKeyPasswordRequest")
-	proto.RegisterType((*ResetKeyPasswordResponse)(nil), "rpcpb.ResetKeyPasswordResponse")
 	proto.RegisterType((*SubmitTransactionRequest)(nil), "rpcpb.SubmitTransactionRequest")
 	proto.RegisterType((*SubmitTransactionResponse)(nil), "rpcpb.SubmitTransactionResponse")
 	proto.RegisterType((*ListAssetsRequest)(nil), "rpcpb.ListAssetsRequest")
@@ -782,6 +583,8 @@ func init() {
 	proto.RegisterType((*ListBalancesResponse)(nil), "rpcpb.ListBalancesResponse")
 	proto.RegisterType((*ListTransactionsRequest)(nil), "rpcpb.ListTransactionsRequest")
 	proto.RegisterType((*ListTransactionsResponse)(nil), "rpcpb.ListTransactionsResponse")
+	proto.RegisterType((*ListTransactionRequest)(nil), "rpcpb.ListTransactionRequest")
+	proto.RegisterType((*ListTransactionResponse)(nil), "rpcpb.ListTransactionResponse")
 	proto.RegisterType((*EstimateTransactionGasRequest)(nil), "rpcpb.EstimateTransactionGasRequest")
 	proto.RegisterType((*EstimateTransactionGasResponse)(nil), "rpcpb.EstimateTransactionGasResponse")
 }
@@ -798,18 +601,14 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ApiServiceClient interface {
-	// state
+	// // state
 	GetState(ctx context.Context, in *NonParamsRequest, opts ...grpc.CallOption) (*GetStateResponse, error)
-	// Key
-	CreateKey(ctx context.Context, in *CreateKeyRequest, opts ...grpc.CallOption) (*CreateKeyResponse, error)
-	ListKey(ctx context.Context, in *NonParamsRequest, opts ...grpc.CallOption) (*ListKeyResponse, error)
-	DeleteKey(ctx context.Context, in *DeleteKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error)
-	ResetKeyPassword(ctx context.Context, in *ResetKeyPasswordRequest, opts ...grpc.CallOption) (*ResetKeyPasswordResponse, error)
 	SubmitTransaction(ctx context.Context, in *SubmitTransactionRequest, opts ...grpc.CallOption) (*SubmitTransactionResponse, error)
 	ListAssets(ctx context.Context, in *ListAssetsRequest, opts ...grpc.CallOption) (*ListAssetsResponse, error)
 	ListBalances(ctx context.Context, in *ListBalancesRequest, opts ...grpc.CallOption) (*ListBalancesResponse, error)
 	ListTransactions(ctx context.Context, in *ListTransactionsRequest, opts ...grpc.CallOption) (*ListTransactionsResponse, error)
 	EstimateTransactionGas(ctx context.Context, in *EstimateTransactionGasRequest, opts ...grpc.CallOption) (*EstimateTransactionGasResponse, error)
+	ListTransaction(ctx context.Context, in *ListTransactionRequest, opts ...grpc.CallOption) (*ListTransactionResponse, error)
 }
 
 type apiServiceClient struct {
@@ -823,42 +622,6 @@ func NewApiServiceClient(cc *grpc.ClientConn) ApiServiceClient {
 func (c *apiServiceClient) GetState(ctx context.Context, in *NonParamsRequest, opts ...grpc.CallOption) (*GetStateResponse, error) {
 	out := new(GetStateResponse)
 	err := c.cc.Invoke(ctx, "/rpcpb.ApiService/GetState", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *apiServiceClient) CreateKey(ctx context.Context, in *CreateKeyRequest, opts ...grpc.CallOption) (*CreateKeyResponse, error) {
-	out := new(CreateKeyResponse)
-	err := c.cc.Invoke(ctx, "/rpcpb.ApiService/CreateKey", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *apiServiceClient) ListKey(ctx context.Context, in *NonParamsRequest, opts ...grpc.CallOption) (*ListKeyResponse, error) {
-	out := new(ListKeyResponse)
-	err := c.cc.Invoke(ctx, "/rpcpb.ApiService/ListKey", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *apiServiceClient) DeleteKey(ctx context.Context, in *DeleteKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/rpcpb.ApiService/DeleteKey", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *apiServiceClient) ResetKeyPassword(ctx context.Context, in *ResetKeyPasswordRequest, opts ...grpc.CallOption) (*ResetKeyPasswordResponse, error) {
-	out := new(ResetKeyPasswordResponse)
-	err := c.cc.Invoke(ctx, "/rpcpb.ApiService/ResetKeyPassword", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -910,20 +673,25 @@ func (c *apiServiceClient) EstimateTransactionGas(ctx context.Context, in *Estim
 	return out, nil
 }
 
+func (c *apiServiceClient) ListTransaction(ctx context.Context, in *ListTransactionRequest, opts ...grpc.CallOption) (*ListTransactionResponse, error) {
+	out := new(ListTransactionResponse)
+	err := c.cc.Invoke(ctx, "/rpcpb.ApiService/ListTransaction", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApiServiceServer is the server API for ApiService service.
 type ApiServiceServer interface {
-	// state
+	// // state
 	GetState(context.Context, *NonParamsRequest) (*GetStateResponse, error)
-	// Key
-	CreateKey(context.Context, *CreateKeyRequest) (*CreateKeyResponse, error)
-	ListKey(context.Context, *NonParamsRequest) (*ListKeyResponse, error)
-	DeleteKey(context.Context, *DeleteKeyRequest) (*empty.Empty, error)
-	ResetKeyPassword(context.Context, *ResetKeyPasswordRequest) (*ResetKeyPasswordResponse, error)
 	SubmitTransaction(context.Context, *SubmitTransactionRequest) (*SubmitTransactionResponse, error)
 	ListAssets(context.Context, *ListAssetsRequest) (*ListAssetsResponse, error)
 	ListBalances(context.Context, *ListBalancesRequest) (*ListBalancesResponse, error)
 	ListTransactions(context.Context, *ListTransactionsRequest) (*ListTransactionsResponse, error)
 	EstimateTransactionGas(context.Context, *EstimateTransactionGasRequest) (*EstimateTransactionGasResponse, error)
+	ListTransaction(context.Context, *ListTransactionRequest) (*ListTransactionResponse, error)
 }
 
 func RegisterApiServiceServer(s *grpc.Server, srv ApiServiceServer) {
@@ -944,78 +712,6 @@ func _ApiService_GetState_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApiServiceServer).GetState(ctx, req.(*NonParamsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ApiService_CreateKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateKeyRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ApiServiceServer).CreateKey(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/rpcpb.ApiService/CreateKey",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApiServiceServer).CreateKey(ctx, req.(*CreateKeyRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ApiService_ListKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NonParamsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ApiServiceServer).ListKey(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/rpcpb.ApiService/ListKey",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApiServiceServer).ListKey(ctx, req.(*NonParamsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ApiService_DeleteKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteKeyRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ApiServiceServer).DeleteKey(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/rpcpb.ApiService/DeleteKey",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApiServiceServer).DeleteKey(ctx, req.(*DeleteKeyRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ApiService_ResetKeyPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ResetKeyPasswordRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ApiServiceServer).ResetKeyPassword(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/rpcpb.ApiService/ResetKeyPassword",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApiServiceServer).ResetKeyPassword(ctx, req.(*ResetKeyPasswordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1110,6 +806,24 @@ func _ApiService_EstimateTransactionGas_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ApiService_ListTransaction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTransactionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApiServiceServer).ListTransaction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/rpcpb.ApiService/ListTransaction",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApiServiceServer).ListTransaction(ctx, req.(*ListTransactionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _ApiService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "rpcpb.ApiService",
 	HandlerType: (*ApiServiceServer)(nil),
@@ -1117,22 +831,6 @@ var _ApiService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetState",
 			Handler:    _ApiService_GetState_Handler,
-		},
-		{
-			MethodName: "CreateKey",
-			Handler:    _ApiService_CreateKey_Handler,
-		},
-		{
-			MethodName: "ListKey",
-			Handler:    _ApiService_ListKey_Handler,
-		},
-		{
-			MethodName: "DeleteKey",
-			Handler:    _ApiService_DeleteKey_Handler,
-		},
-		{
-			MethodName: "ResetKeyPassword",
-			Handler:    _ApiService_ResetKeyPassword_Handler,
 		},
 		{
 			MethodName: "SubmitTransaction",
@@ -1154,66 +852,56 @@ var _ApiService_serviceDesc = grpc.ServiceDesc{
 			MethodName: "EstimateTransactionGas",
 			Handler:    _ApiService_EstimateTransactionGas_Handler,
 		},
+		{
+			MethodName: "ListTransaction",
+			Handler:    _ApiService_ListTransaction_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "rpc.proto",
 }
 
-func init() { proto.RegisterFile("rpc.proto", fileDescriptor_rpc_9a8374e6f0412a34) }
+func init() { proto.RegisterFile("rpc.proto", fileDescriptor_rpc_a87e4a92f82d64fe) }
 
-var fileDescriptor_rpc_9a8374e6f0412a34 = []byte{
-	// 838 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x54, 0xc1, 0x52, 0xdb, 0x3a,
-	0x14, 0x9d, 0x24, 0x0f, 0x48, 0x2e, 0x3c, 0x48, 0x04, 0x2f, 0x18, 0x93, 0xc7, 0x0b, 0x9a, 0xc7,
-	0xe3, 0x0d, 0xd3, 0x24, 0x53, 0xe8, 0xaa, 0x8b, 0x76, 0xa0, 0x30, 0x4c, 0xa7, 0x1d, 0xca, 0x04,
-	0x16, 0xed, 0xa2, 0x0b, 0xc5, 0x51, 0x53, 0x4f, 0x1d, 0xdb, 0x58, 0x72, 0x20, 0xdb, 0x7e, 0x40,
-	0x37, 0xfd, 0x8a, 0x7e, 0x4f, 0x7f, 0xa1, 0x1f, 0xd2, 0x91, 0x2c, 0x2b, 0xb2, 0x13, 0xb7, 0x3b,
-	0xdf, 0x7b, 0x8f, 0xce, 0x39, 0xf2, 0xb5, 0x0f, 0xd4, 0xa2, 0xd0, 0xe9, 0x86, 0x51, 0xc0, 0x03,
-	0xb4, 0x14, 0x85, 0x4e, 0x38, 0xb0, 0x5b, 0xa3, 0x20, 0x18, 0x79, 0xb4, 0x47, 0x42, 0xb7, 0x47,
-	0x7c, 0x3f, 0xe0, 0x84, 0xbb, 0x81, 0xcf, 0x12, 0x90, 0xbd, 0xab, 0xa6, 0xb2, 0x1a, 0xc4, 0x1f,
-	0x7a, 0x74, 0x1c, 0xf2, 0x69, 0x32, 0xc4, 0x08, 0xea, 0x57, 0x81, 0x7f, 0x4d, 0x22, 0x32, 0x66,
-	0x7d, 0x7a, 0x17, 0x53, 0xc6, 0xf1, 0x11, 0xd4, 0x2f, 0x29, 0xbf, 0xe1, 0x84, 0xd3, 0x3e, 0x65,
-	0x61, 0xe0, 0x33, 0x8a, 0x9a, 0xb0, 0xcc, 0x38, 0xe1, 0x31, 0xb3, 0x4a, 0xed, 0xd2, 0xff, 0xb5,
-	0xbe, 0xaa, 0xf0, 0x39, 0xd4, 0x5f, 0x44, 0x94, 0x70, 0xfa, 0x8a, 0x4e, 0xd5, 0x79, 0xb4, 0x05,
-	0x4b, 0xc4, 0x73, 0x49, 0x0a, 0x4d, 0x0a, 0x64, 0x43, 0x35, 0x24, 0x8c, 0xdd, 0x07, 0xd1, 0xd0,
-	0x2a, 0xcb, 0x81, 0xae, 0xf1, 0x21, 0x34, 0x0c, 0x16, 0x25, 0x89, 0xe0, 0x8f, 0x87, 0x30, 0x1e,
-	0x28, 0x16, 0xf9, 0x8c, 0x0f, 0x60, 0xe3, 0xb5, 0xcb, 0xf8, 0x62, 0x58, 0x45, 0xc3, 0xce, 0xa0,
-	0x7e, 0x4e, 0x3d, 0x9a, 0x71, 0x65, 0xea, 0x97, 0xb2, 0xfa, 0x9a, 0xa3, 0x6c, 0x48, 0xdd, 0xc1,
-	0x76, 0x9f, 0x32, 0x2a, 0xb4, 0xae, 0x15, 0x2e, 0xa5, 0x5a, 0xe0, 0x0c, 0xb5, 0x61, 0x35, 0xf0,
-	0x86, 0xd7, 0xd9, 0x1b, 0x9a, 0x2d, 0x81, 0xf0, 0xe9, 0xbd, 0x46, 0x54, 0x12, 0x84, 0xd1, 0xc2,
-	0x4f, 0xc0, 0x9a, 0x97, 0x54, 0xd7, 0xb4, 0x60, 0xc5, 0xf9, 0x48, 0xfc, 0x11, 0x4d, 0xdc, 0x57,
-	0xfb, 0x69, 0x89, 0xcf, 0xc0, 0xba, 0x89, 0x07, 0x63, 0x97, 0xdf, 0x46, 0xc4, 0x67, 0xc4, 0x11,
-	0xbb, 0x4f, 0x9d, 0xfe, 0x07, 0xeb, 0x11, 0xb9, 0x37, 0x06, 0xca, 0x73, 0xae, 0x8b, 0x7b, 0xb0,
-	0xb3, 0x80, 0x63, 0xf6, 0x86, 0xf9, 0xc3, 0xcb, 0xf3, 0xf4, 0xba, 0xe2, 0x19, 0x77, 0xa0, 0x21,
-	0x16, 0x71, 0xca, 0x18, 0xe5, 0xe9, 0x87, 0x23, 0x3c, 0x12, 0xd1, 0xd0, 0xd8, 0xb4, 0xc4, 0x8f,
-	0x00, 0x99, 0xf0, 0xd9, 0x47, 0x25, 0x01, 0x4c, 0x2d, 0x4f, 0x55, 0xf8, 0x04, 0x36, 0x05, 0xfa,
-	0x8c, 0x78, 0xc4, 0x77, 0xa8, 0xa6, 0x6f, 0x41, 0x8d, 0x38, 0x4e, 0x10, 0xfb, 0x33, 0x81, 0x59,
-	0x03, 0x1f, 0xc3, 0x56, 0xf6, 0x90, 0x12, 0xb1, 0xa1, 0x3a, 0x50, 0x3d, 0x25, 0xa3, 0x6b, 0xec,
-	0xc0, 0xb6, 0x38, 0x63, 0x5c, 0x9a, 0x19, 0x3b, 0xce, 0x5f, 0x3a, 0x6b, 0xa0, 0x9c, 0x33, 0x20,
-	0x6e, 0x33, 0xa4, 0x9c, 0xb8, 0x9e, 0x5c, 0x6d, 0xb5, 0xaf, 0x2a, 0xfc, 0x0c, 0xac, 0x79, 0x11,
-	0x65, 0x0e, 0xc3, 0x1a, 0x37, 0xfa, 0xca, 0x60, 0xa6, 0x87, 0x9f, 0xc3, 0xdf, 0x17, 0x8c, 0xbb,
-	0x63, 0xc2, 0xa9, 0xc1, 0x71, 0x49, 0xb4, 0xd5, 0x3d, 0x00, 0xfe, 0x70, 0x4b, 0xc7, 0xa1, 0x47,
-	0x38, 0x55, 0x86, 0x8d, 0x0e, 0x8e, 0x60, 0xaf, 0x88, 0x60, 0xf6, 0x8e, 0x78, 0xc0, 0x89, 0x77,
-	0x45, 0x63, 0x79, 0xbe, 0xd2, 0xd7, 0xb5, 0x60, 0x67, 0x3c, 0x88, 0xc8, 0x88, 0x8a, 0x69, 0x59,
-	0x4e, 0x8d, 0x8e, 0xf8, 0xdb, 0x27, 0x63, 0x31, 0xaa, 0xc8, 0x51, 0x52, 0x1c, 0x7f, 0xab, 0x02,
-	0x9c, 0x86, 0xee, 0x0d, 0x8d, 0x26, 0xae, 0x43, 0xd1, 0x1b, 0xa8, 0xa6, 0x91, 0x82, 0xb6, 0xbb,
-	0x32, 0xb5, 0xba, 0xf9, 0xdc, 0xb1, 0xd3, 0x41, 0x3e, 0x7c, 0x70, 0xe3, 0xf3, 0xf7, 0x1f, 0x5f,
-	0xcb, 0xab, 0xa8, 0xd6, 0x9b, 0x3c, 0xee, 0x31, 0x49, 0xf2, 0x0e, 0x6a, 0x3a, 0x31, 0x34, 0x63,
-	0x3e, 0x89, 0x6c, 0x6b, 0x7e, 0xa0, 0x28, 0x77, 0x24, 0xe5, 0x26, 0x5e, 0x17, 0x94, 0x8e, 0x1c,
-	0x77, 0x3e, 0xd1, 0xe9, 0xd3, 0xd2, 0x11, 0xba, 0x85, 0x15, 0x95, 0x31, 0xc5, 0x56, 0x9b, 0x6a,
-	0x90, 0x0b, 0x23, 0x6c, 0x49, 0x5a, 0x84, 0xff, 0x14, 0xb4, 0x9e, 0xcb, 0xb8, 0x20, 0x65, 0x82,
-	0xf5, 0x2d, 0xd4, 0x74, 0x24, 0x69, 0xde, 0x7c, 0x48, 0xd9, 0xcd, 0x6e, 0x12, 0xd6, 0xdd, 0x34,
-	0xac, 0xbb, 0x17, 0x22, 0xac, 0xb1, 0x2d, 0x79, 0xb7, 0xf0, 0x86, 0xe0, 0x1d, 0xca, 0x53, 0x9a,
-	0x79, 0x02, 0xf5, 0x7c, 0x6a, 0xa0, 0x3d, 0x25, 0x50, 0x90, 0x60, 0xf6, 0x3f, 0x85, 0x73, 0x75,
-	0x91, 0x7d, 0x29, 0xb8, 0x8b, 0x9b, 0x42, 0x30, 0x12, 0x28, 0xa1, 0xd7, 0x49, 0x13, 0x53, 0xe8,
-	0x4e, 0xa1, 0x31, 0x97, 0x19, 0x28, 0x25, 0x2e, 0x4a, 0x24, 0xbb, 0x5d, 0x0c, 0x58, 0x24, 0xcd,
-	0x24, 0xac, 0x63, 0xfc, 0x10, 0x42, 0xfa, 0x3d, 0xc0, 0x2c, 0x4e, 0x90, 0x65, 0x2c, 0x23, 0x13,
-	0x48, 0xf6, 0xce, 0x82, 0x89, 0x52, 0xc9, 0xbc, 0x51, 0xb9, 0xa9, 0x24, 0x7c, 0x04, 0x3d, 0x85,
-	0x35, 0x33, 0x4a, 0x90, 0x6d, 0xd0, 0xe4, 0x42, 0xc9, 0xde, 0x5d, 0x38, 0x53, 0x22, 0x2d, 0x29,
-	0xd2, 0xc4, 0x0d, 0x2d, 0x92, 0x46, 0x8f, 0x90, 0x89, 0xa1, 0x9e, 0x0f, 0x06, 0xbd, 0xb8, 0x82,
-	0x58, 0xd2, 0x8b, 0x2b, 0x4a, 0x14, 0xdc, 0x96, 0x92, 0x36, 0xfe, 0x4b, 0x4b, 0x9a, 0x61, 0x22,
-	0x64, 0xbf, 0x94, 0xa0, 0xb9, 0x38, 0x0f, 0xd0, 0xbf, 0x8a, 0xfd, 0x97, 0x79, 0x63, 0x1f, 0xfc,
-	0x06, 0xa5, 0x9c, 0x1c, 0x4a, 0x27, 0xfb, 0xb8, 0x25, 0x9c, 0x50, 0x85, 0x35, 0xdd, 0x74, 0x46,
-	0x44, 0x18, 0x1a, 0x2c, 0xcb, 0x8f, 0xfd, 0xe4, 0x67, 0x00, 0x00, 0x00, 0xff, 0xff, 0x7b, 0xae,
-	0xe9, 0xf1, 0xd9, 0x08, 0x00, 0x00,
+var fileDescriptor_rpc_a87e4a92f82d64fe = []byte{
+	// 624 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x55, 0x5d, 0x4f, 0x13, 0x41,
+	0x14, 0x4d, 0x5b, 0xa9, 0xf4, 0x4a, 0xa0, 0x1d, 0x6b, 0x59, 0x96, 0x52, 0xca, 0xc4, 0x0f, 0x24,
+	0xb4, 0x8d, 0xf0, 0xe6, 0x83, 0x06, 0x82, 0x21, 0x24, 0x8a, 0xa6, 0xe5, 0xd5, 0x87, 0xe9, 0x32,
+	0x69, 0x36, 0x69, 0x77, 0xd7, 0x99, 0xbb, 0xb5, 0xbe, 0xfa, 0x03, 0x7c, 0xf1, 0xcd, 0xbf, 0xe5,
+	0x5f, 0xf0, 0x87, 0x98, 0x99, 0xce, 0x6e, 0x87, 0xed, 0x56, 0x7c, 0xe3, 0xde, 0x73, 0xef, 0x39,
+	0xe7, 0x76, 0xe7, 0x04, 0xa8, 0x88, 0xc8, 0xeb, 0x46, 0x22, 0xc4, 0x90, 0xac, 0x89, 0xc8, 0x8b,
+	0x86, 0x6e, 0x73, 0x14, 0x86, 0xa3, 0x31, 0xef, 0xb1, 0xc8, 0xef, 0xb1, 0x20, 0x08, 0x91, 0xa1,
+	0x1f, 0x06, 0x72, 0x3e, 0x44, 0x09, 0x54, 0xaf, 0xc3, 0xe0, 0x13, 0x13, 0x6c, 0x22, 0xfb, 0xfc,
+	0x4b, 0xcc, 0x25, 0xd2, 0x23, 0xa8, 0x5e, 0x72, 0x1c, 0x20, 0x43, 0xde, 0xe7, 0x32, 0x0a, 0x03,
+	0xc9, 0x49, 0x03, 0xca, 0x12, 0x19, 0xc6, 0xd2, 0x29, 0xb4, 0x0b, 0x87, 0x95, 0xbe, 0xa9, 0xe8,
+	0x39, 0x38, 0x83, 0x78, 0x38, 0xf1, 0xf1, 0x46, 0xb0, 0x40, 0x32, 0x4f, 0x71, 0x1b, 0x1e, 0xf2,
+	0x1c, 0x36, 0x05, 0xfb, 0x6a, 0x01, 0x66, 0x37, 0xd3, 0xa5, 0x3d, 0xd8, 0xc9, 0xe1, 0x30, 0xc2,
+	0x04, 0x1e, 0xe0, 0xec, 0xea, 0xc2, 0xac, 0xea, 0xbf, 0x69, 0x07, 0x6a, 0xef, 0x7d, 0x89, 0x67,
+	0x52, 0x72, 0x4c, 0x5c, 0x13, 0x07, 0x1e, 0xb2, 0xdb, 0x5b, 0xc1, 0x65, 0x62, 0x31, 0x29, 0xe9,
+	0x31, 0x10, 0x7b, 0x7c, 0x71, 0x11, 0xd3, 0x9d, 0xe4, 0xa2, 0x79, 0x45, 0x4f, 0xe1, 0xb1, 0x9a,
+	0x3e, 0x67, 0x63, 0x16, 0x78, 0x3c, 0xa5, 0x6f, 0x42, 0x85, 0x79, 0x5e, 0x18, 0x07, 0x98, 0x9a,
+	0x59, 0x34, 0xe8, 0x09, 0xd4, 0xef, 0x2e, 0x19, 0x11, 0x17, 0xd6, 0x87, 0xa6, 0xe7, 0x14, 0xda,
+	0xa5, 0xc3, 0x4a, 0x3f, 0xad, 0xe9, 0x07, 0xd8, 0x56, 0x3b, 0xd6, 0xd1, 0xf7, 0xdf, 0xa2, 0x11,
+	0xe5, 0xf3, 0xea, 0xc2, 0x29, 0x1a, 0x64, 0x5e, 0xd2, 0x37, 0xe0, 0x2c, 0xd3, 0x19, 0x1b, 0x14,
+	0x36, 0xd0, 0xea, 0x1b, 0x2b, 0x77, 0x7a, 0xf4, 0x18, 0x1a, 0x99, 0xfd, 0xc4, 0x4d, 0xde, 0x27,
+	0x78, 0xb9, 0x64, 0x3e, 0x15, 0xdb, 0x84, 0x22, 0xce, 0xcc, 0x70, 0x11, 0x67, 0xf4, 0x2d, 0xec,
+	0xbd, 0x93, 0xe8, 0x4f, 0x18, 0x72, 0x6b, 0xfc, 0x92, 0xa5, 0xd7, 0xb6, 0x00, 0x70, 0x76, 0xc3,
+	0x27, 0xd1, 0x98, 0x21, 0x37, 0x8b, 0x56, 0x87, 0x0a, 0x68, 0xad, 0x22, 0x58, 0xfc, 0xcc, 0x18,
+	0x22, 0x1b, 0x5f, 0xf3, 0x58, 0xef, 0x97, 0xfa, 0x69, 0xad, 0xd8, 0x25, 0x86, 0x82, 0x8d, 0xb8,
+	0x42, 0x8b, 0x1a, 0xb5, 0x3a, 0xa4, 0x0e, 0x6b, 0xd3, 0x89, 0x82, 0x4a, 0x1a, 0x9a, 0x17, 0x27,
+	0xbf, 0xca, 0x00, 0x67, 0x91, 0x3f, 0xe0, 0x62, 0xea, 0x7b, 0x9c, 0x7c, 0x84, 0xf5, 0x24, 0x12,
+	0x64, 0xbb, 0xab, 0x83, 0xd5, 0xcd, 0xe6, 0xc6, 0x4d, 0x80, 0x6c, 0x78, 0x68, 0xed, 0xfb, 0xef,
+	0x3f, 0x3f, 0x8b, 0x8f, 0x48, 0xa5, 0x37, 0x7d, 0xd5, 0x93, 0x9a, 0xe4, 0x1b, 0xd4, 0x96, 0xde,
+	0x3c, 0xd9, 0x37, 0x04, 0xab, 0x12, 0xe5, 0xb6, 0x57, 0x0f, 0x18, 0xa9, 0x03, 0x2d, 0xb5, 0x4b,
+	0x1b, 0x5a, 0x4a, 0x8f, 0x75, 0xac, 0xcf, 0xfc, 0xba, 0x70, 0x44, 0x3e, 0x03, 0x2c, 0xe2, 0x40,
+	0x1c, 0x43, 0xb9, 0x14, 0x28, 0x77, 0x27, 0x07, 0x31, 0x2a, 0xae, 0x56, 0xa9, 0xd3, 0x2d, 0xa5,
+	0x32, 0xf6, 0x25, 0x76, 0xe6, 0xe1, 0x51, 0xf4, 0x1c, 0x36, 0xec, 0x28, 0x10, 0xd7, 0xa2, 0xc9,
+	0x84, 0xca, 0xdd, 0xcd, 0xc5, 0x8c, 0x48, 0x53, 0x8b, 0x34, 0x68, 0x2d, 0x15, 0x49, 0xa2, 0xa3,
+	0x64, 0x62, 0xa8, 0x66, 0x9f, 0x3b, 0x69, 0x59, 0x74, 0x39, 0xb1, 0x72, 0xf7, 0x57, 0xe2, 0x46,
+	0xb2, 0xad, 0x25, 0x5d, 0xfa, 0x24, 0x95, 0xb4, 0x23, 0xa2, 0x64, 0x7f, 0x14, 0xa0, 0x91, 0xff,
+	0x18, 0xc9, 0x53, 0xc3, 0xfe, 0xcf, 0xc7, 0xee, 0x3e, 0xbb, 0x67, 0xca, 0x38, 0x79, 0xa1, 0x9d,
+	0x1c, 0xd0, 0xa6, 0x72, 0xc2, 0xcd, 0xac, 0xed, 0xa6, 0x33, 0x62, 0xda, 0x90, 0x80, 0xad, 0xcc,
+	0x39, 0x64, 0x2f, 0xff, 0xcc, 0xc4, 0x41, 0x6b, 0x15, 0xfc, 0xbf, 0x3f, 0xc2, 0xb0, 0xac, 0xff,
+	0x77, 0x9c, 0xfe, 0x0d, 0x00, 0x00, 0xff, 0xff, 0x94, 0xba, 0xe4, 0x6e, 0x6d, 0x06, 0x00, 0x00,
 }

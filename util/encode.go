@@ -6,7 +6,7 @@ import (
 )
 
 func JsonEncode(v interface{}) []byte {
-	b, err := json.MarshalIndent(v, "", "    ")
+	b, err := json.Marshal(v)
 	if err != nil {
 		//TODO panic
 		err = fmt.Errorf("JsonEncode to json failed, %v", err)

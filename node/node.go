@@ -18,10 +18,10 @@ import (
 	"github.com/bytom/accesstoken"
 	"github.com/bytom/account"
 	"github.com/bytom/api"
-	"github.com/bytom/rpc"
 	"github.com/bytom/asset"
 	"github.com/bytom/blockchain/pseudohsm"
 	"github.com/bytom/blockchain/txfeed"
+	"github.com/bytom/chaincache"
 	cfg "github.com/bytom/config"
 	"github.com/bytom/consensus"
 	"github.com/bytom/database/leveldb"
@@ -31,6 +31,7 @@ import (
 	"github.com/bytom/netsync"
 	"github.com/bytom/protocol"
 	"github.com/bytom/protocol/bc"
+	"github.com/bytom/rpc"
 	"github.com/bytom/types"
 	w "github.com/bytom/wallet"
 )
@@ -54,8 +55,9 @@ type Node struct {
 	wallet       *w.Wallet
 	accessTokens *accesstoken.CredentialStore
 	api          *api.API
-	rpc			*rpc.Rpc
+	rpc          *rpc.Rpc
 	chain        *protocol.Chain
+	chainCache   *chaincache.ChainCache
 	txfeed       *txfeed.Tracker
 	cpuMiner     *cpuminer.CPUMiner
 	miningPool   *miningpool.MiningPool
@@ -137,6 +139,9 @@ func NewNode(config *cfg.Config) *Node {
 		}()
 	}
 
+	// chainCache
+	chainCache := chaincache.NewChainCache(store, chain, wallet)
+
 	node := &Node{
 		config:       config,
 		syncManager:  syncManager,
@@ -144,6 +149,7 @@ func NewNode(config *cfg.Config) *Node {
 		accessTokens: accessTokens,
 		wallet:       wallet,
 		chain:        chain,
+		chainCache:   chainCache,
 		txfeed:       txFeed,
 		miningEnable: config.Mining,
 	}
@@ -205,7 +211,7 @@ func launchWebBrowser() {
 //}
 
 func (n *Node) initAndstartRpcServer() {
-	n.rpc = rpc.NewRpc(n.wallet,n.chain, n.config)
+	n.rpc = rpc.NewRpc(n.chainCache)
 
 	api_addr := env.String("LISTEN", n.config.ApiAddress)
 	rpc_addr := env.String("RPCLISTEN", n.config.RpcAddress)
@@ -236,6 +242,9 @@ func (n *Node) OnStop() {
 	}
 	if !n.config.VaultMode {
 		n.syncManager.Stop()
+	}
+	if n.chainCache != nil {
+		n.chainCache.Close()
 	}
 }
 

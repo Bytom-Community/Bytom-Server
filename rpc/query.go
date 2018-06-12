@@ -2,53 +2,62 @@ package rpc
 
 import (
 	"context"
-	// "fmt"
-	// "github.com/bytom/blockchain/query"
 	"github.com/bytom/rpc/pb"
-	"github.com/bytom/util"
-	// "github.com/bytom/util"
 )
 
 func (s *ApiService) ListAssets(ctx context.Context, req *rpcpb.ListAssetsRequest) (*rpcpb.ListAssetsResponse, error) {
-	address := req.Address
-	assets := s.chainCache.ListAssets(address)
-	results := string(util.JsonEncode(assets))
-	return &rpcpb.ListAssetsResponse{Assets: results}, nil
+	var assets []*rpcpb.Asset
+	for address, amount := range s.chainCache.ListAssets(req.Address) {
+		asset := &rpcpb.Asset{
+			Address: address,
+			Amount:  amount,
+		}
+		assets = append(assets, asset)
+	}
+	return &rpcpb.ListAssetsResponse{Assets: assets}, nil
 }
 
-func (s *ApiService) ListBalances(ctx context.Context, req *rpcpb.ListBalancesRequest) (*rpcpb.ListBalancesResponse, error) {
-	// accountID := req.AccountID
-	// balances, err := s.wallet.GetAccountBalances(accountID)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("list-balances: %v", err.Error())
-	// }
-
-	// var results []string
-	// for _, balance := range balances {
-	// 	results = append(results, string(util.JsonEncode(balance)))
-	// }
-
-	// return &rpcpb.ListBalancesResponse{Balances: results}, nil
-	return nil, nil
-}
-
-// ListTransactions list transactions form chain
 func (s *ApiService) ListTransactions(ctx context.Context, req *rpcpb.ListTransactionsRequest) (*rpcpb.ListTransactionsResponse, error) {
-	address := req.Address
-	assetID := req.AssetID
+	var transactions []*rpcpb.TX
+	for _, tx := range s.chainCache.ListTransactions(req.Address, req.AssetID) {
+		var inputs []*rpcpb.Input
+		var outputs []*rpcpb.Output
 
-	txs := s.chainCache.ListTransactions(address, assetID)
+		for _, v := range tx.Inputs {
+			input := &rpcpb.Input{
+				Type:          v.Type,
+				AssetID:       v.AssetID.String(),
+				Amount:        v.Amount,
+				Address:       v.Address,
+				SpentOutputID: v.SpentOutputID.String(),
+			}
+			inputs = append(inputs, input)
+		}
 
-	var transactions []string
-	for _, tx := range txs {
-		transactions = append(transactions, string(util.JsonEncode(tx)))
+		for _, v := range tx.Outputs {
+			output := &rpcpb.Output{
+				Type:     v.Type,
+				AssetID:  v.AssetID.String(),
+				Amount:   v.Amount,
+				Address:  v.Address,
+				OutputID: v.OutputID.String(),
+				Position: int32(v.Position),
+			}
+			outputs = append(outputs, output)
+		}
+		TX := &rpcpb.TX{
+			ID:                     tx.ID.String(),
+			Timestamp:              tx.Timestamp,
+			BlockID:                tx.BlockID.String(),
+			BlockHeight:            tx.BlockHeight,
+			Position:               tx.Position,
+			BlockTransactionsCount: tx.BlockTransactionsCount,
+			Confirmation:           s.chainCache.BestBlockHeight() - tx.BlockHeight,
+			StatusFail:             tx.StatusFail,
+			Inputs:                 inputs,
+			Outputs:                outputs,
+		}
+		transactions = append(transactions, TX)
 	}
 	return &rpcpb.ListTransactionsResponse{Transactions: transactions}, nil
-}
-
-func (s *ApiService) ListTransaction(ctx context.Context, req *rpcpb.ListTransactionRequest) (*rpcpb.ListTransactionResponse, error) {
-	txID := req.TxID
-	tx := s.chainCache.ListTransaction(txID)
-
-	return &rpcpb.ListTransactionResponse{Tx: string(util.JsonEncode(tx))}, nil
 }

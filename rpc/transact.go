@@ -17,7 +17,6 @@ import (
 )
 
 var (
-	defaultTxTTL    = 5 * time.Minute
 	defaultBaseRate = float64(100000)
 )
 

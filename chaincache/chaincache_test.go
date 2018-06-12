@@ -11,7 +11,8 @@ import (
 	w "github.com/bytom/wallet"
 	"testing"
 
-	"github.com/bytom/protocol/bc/types"
+	"github.com/Bytom-Community/Bytom-Mobile-Wallet/util"
+	//"github.com/bytom/protocol/bc/types"
 	cmn "github.com/tendermint/tmlibs/common"
 	dbm "github.com/tendermint/tmlibs/db"
 )
@@ -56,40 +57,39 @@ func TestListAssets(t *testing.T) {
 }
 
 func TestListTransactions(t *testing.T) {
-	//height := c.chain.BestBlockHeight()
 	stime = time.Now().UnixNano()
 	d := c.ListTransactions("bm1q5p9d4gelfm4cc3zq3slj7vh2njx23ma2cf866j", "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
 	etime = time.Now().UnixNano()
 	totalTime := (etime - stime) / 1e6
 	if len(d) != 0 {
-		for k, v := range d {
-			t.Logf("%v, txID:%v\n", k, v.ID.String())
-		}
+		b := util.JsonEncode(d)
+		t.Log(string(b))
 		t.Logf("run time: %v ms", totalTime)
 	}
 }
 
-func TestListTransaction(t *testing.T) {
-	//height := c.chain.BestBlockHeight()
-	stime = time.Now().UnixNano()
-	d := c.ListTransaction("795e78a66ab73c209e13635a057810098455bf15b68107f2df93edf910185bf6")
-	etime = time.Now().UnixNano()
-	totalTime := (etime - stime) / 1e6
-	if len(d) != 0 {
-		block, ok := d["block"].(*types.Block)
-		if !ok {
-			panic("can not cover block to *types.Block")
-		}
-		t.Logf("height:%v, timestamp:%v, len:%v, confirmations:%v\n",
-			block.Height, block.Timestamp, len(block.Transactions), chain.BestBlockHeight()-block.Height)
-
-		var TX = make(map[string]interface{})
-		TX["inputs"] = d["inputs"]
-		TX["outputs"] = d["outputs"]
-		printJSON(TX)
-		t.Logf("run time: %v ms", totalTime)
-	}
-}
+//
+//func TestListTransaction(t *testing.T) {
+//	//height := c.chain.BestBlockHeight()
+//	stime = time.Now().UnixNano()
+//	d := c.ListTransaction("795e78a66ab73c209e13635a057810098455bf15b68107f2df93edf910185bf6")
+//	etime = time.Now().UnixNano()
+//	totalTime := (etime - stime) / 1e6
+//	if len(d) != 0 {
+//		block, ok := d["block"].(*types.Block)
+//		if !ok {
+//			panic("can not cover block to *types.Block")
+//		}
+//		t.Logf("height:%v, timestamp:%v, len:%v, confirmations:%v\n",
+//			block.Height, block.Timestamp, len(block.Transactions), chain.BestBlockHeight()-block.Height)
+//
+//		var TX = make(map[string]interface{})
+//		TX["inputs"] = d["inputs"]
+//		TX["outputs"] = d["outputs"]
+//		printJSON(TX)
+//		t.Logf("run time: %v ms", totalTime)
+//	}
+//}
 
 func printJSON(data interface{}) {
 	dataMap, ok := data.(map[string]interface{})

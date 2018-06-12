@@ -11,56 +11,49 @@ message GetStateResponse {
     string status = 1;
 }
 
-// message CreateKeyRequest {
-//     string alias = 1;
-//     string password = 2;
-// }
-
-// message CreateKeyResponse {
-//     string xpub = 1;
-// }
-
-// message ListKeyResponse {
-//     repeated string xpub = 1;
-// }
-
-// message DeleteKeyRequest {
-//     string password = 1;
-//     string xpub = 2;
-// }
-
-// message ResetKeyPasswordRequest {
-//     string xpub = 1;
-//     string oldPassword = 2;
-//     string newPassword = 3;
-// }
-
-// message ResetKeyPasswordResponse {
-//     bool changed = 1;
-// }
-
-message SubmitTransactionRequest {
-    string rawTransaction = 1;
-}
-
-message SubmitTransactionResponse {
-    string txID = 1;
-}
-
+// assets
 message ListAssetsRequest {
     string address = 1;
 }
 
 message ListAssetsResponse {
-    string assets = 1;
+    repeated Asset assets = 1;
 }
 
-message ListBalancesRequest {
-    string accountID = 1;
+message Asset {
+    string address = 1;
+    uint64 amount = 2;
 }
 
-message ListBalancesResponse {
-    repeated string balances = 1;
+// transactions
+message Input {
+    string type = 1;
+    string assetID = 2;
+    uint64 amount =3;
+    string address = 4;
+    string spentOutputID = 5;
+}
+
+message Output {
+    string type = 1;
+    string assetID =2;
+    uint64 amount = 3;
+    string address = 4;
+    string OutputID = 5;
+    int32 position = 6;
+}
+
+message TX {
+    string ID = 1;
+    uint64 timestamp = 2;
+    string blockID = 3;
+    uint64 blockHeight = 4;
+    uint32 position = 5;
+    uint32 blockTransactionsCount = 6;
+    uint64 confirmation = 7;
+    bool statusFail = 8;
+    repeated Input inputs = 9;
+    repeated Output outputs = 10;
 }
 
 message ListTransactionsRequest {
@@ -69,17 +62,19 @@ message ListTransactionsRequest {
 }
 
 message ListTransactionsResponse {
-    repeated string transactions = 1;
+    repeated TX transactions = 1;
 }
 
-message ListTransactionRequest {
+// submit tx
+message SubmitTransactionRequest {
+    string rawTransaction = 1;
+}
+
+message SubmitTransactionResponse {
     string txID = 1;
 }
 
-message ListTransactionResponse {
-    string tx = 1;
-}
-
+// gas
 message EstimateTransactionGasRequest {
     string txTemplate = 1;
 }
@@ -91,59 +86,16 @@ message EstimateTransactionGasResponse {
 }
 
 service ApiService {
-    // // state
+    // state
     rpc GetState (NonParamsRequest) returns (GetStateResponse) {
         option (google.api.http) = {
             get: "/v1/state"
         };
     }
 
-    // // Key
-    // rpc CreateKey(CreateKeyRequest) returns (CreateKeyResponse) {
-    //     option (google.api.http) = {
-    //         post: "/v1/create-key"
-    //         body: "*"
-    //     };
-    // }
-
-    // rpc ListKey(NonParamsRequest) returns (ListKeyResponse) {
-    //     option (google.api.http) = {
-    //         post: "/v1/list-keys"
-    //         body: "*"
-    //     };
-    // }
-
-    // rpc DeleteKey(DeleteKeyRequest) returns (google.protobuf.Empty) {
-    //     option (google.api.http) = {
-    //         post: "/v1/delete-keys"
-    //         body: "*"
-    //     };
-    // }
-
-    // rpc ResetKeyPassword(ResetKeyPasswordRequest) returns (ResetKeyPasswordResponse) {
-    //     option (google.api.http) = {
-    //         post: "/v1/reset-key-password"
-    //         body: "*"
-    //     };
-    // }
-
-    rpc SubmitTransaction(SubmitTransactionRequest) returns (SubmitTransactionResponse) {
-        option (google.api.http) = {
-            post: "/v1/submit-transaction"
-            body: "*"
-        };
-    }
-
     rpc ListAssets(ListAssetsRequest) returns (ListAssetsResponse) {
         option (google.api.http) = {
             post: "/v1/list-assets"
-            body: "*"
-        };
-    }
-
-    rpc ListBalances(ListBalancesRequest) returns (ListBalancesResponse) {
-        option (google.api.http) = {
-            post: "/v1/list-balances"
             body: "*"
         };
     }
@@ -155,16 +107,16 @@ service ApiService {
         };
     }
 
-    rpc EstimateTransactionGas(EstimateTransactionGasRequest) returns (EstimateTransactionGasResponse) {
+    rpc SubmitTransaction(SubmitTransactionRequest) returns (SubmitTransactionResponse) {
         option (google.api.http) = {
-            post: "/v1/estimate-transaction-gas"
+            post: "/v1/submit-transaction"
             body: "*"
         };
     }
 
-    rpc ListTransaction(ListTransactionRequest) returns (ListTransactionResponse) {
+    rpc EstimateTransactionGas(EstimateTransactionGasRequest) returns (EstimateTransactionGasResponse) {
         option (google.api.http) = {
-            post: "/v1/list-transactions"
+            post: "/v1/estimate-transaction-gas"
             body: "*"
         };
     }

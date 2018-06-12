@@ -3,9 +3,9 @@ package chaincache
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/bytom/account"
-
 	"github.com/bytom/asset"
 	"github.com/bytom/blockchain/query"
 	"github.com/bytom/database/leveldb"
@@ -13,8 +13,6 @@ import (
 	"github.com/bytom/protocol/bc"
 	"github.com/bytom/protocol/bc/types"
 	w "github.com/bytom/wallet"
-
-	"time"
 
 	log "github.com/sirupsen/logrus"
 	cmn "github.com/tendermint/tmlibs/common"
@@ -26,7 +24,7 @@ type ChainCache struct {
 	store               *leveldb.Store
 	chain               *protocol.Chain
 	wallet              *w.Wallet
-	BlockChain          []*types.Block
+	BlockChain          map[bc.Hash]*types.Block
 	TransactionsOutputs map[bc.Hash][]*query.AnnotatedOutput
 	exitCh              chan bool
 }
@@ -71,30 +69,37 @@ func (c *ChainCache) updateChain() {
 	c.TransactionsOutputs = txOutputs
 }
 
-func (c *ChainCache) readChain() (blocks []*types.Block, txOutputs map[bc.Hash][]*query.AnnotatedOutput) {
+func (c *ChainCache) readChain() (blocks map[bc.Hash]*types.Block, txOutputs map[bc.Hash][]*query.AnnotatedOutput) {
 
 	bcHash := c.chain.BestBlockHash()
 	height := c.chain.BestBlockHeight()
+	blocks = make(map[bc.Hash]*types.Block)
 	txOutputs = make(map[bc.Hash][]*query.AnnotatedOutput)
 
 	for i := height; i > 0; i-- {
 		block, err := c.store.GetBlock(bcHash)
 		if err != nil {
-			cmn.Exit(cmn.Fmt("Failed to start switch: %v", err))
+			cmn.Exit(cmn.Fmt("Failed to get block from store: %v", err))
 		}
-		blocks = append(blocks, block)
+		blocks[block.Hash()] = block
 
+		var txid bc.Hash
 		var outpus = []*query.AnnotatedOutput{}
 		for _, tx := range block.Transactions {
+			txid = tx.ID
 			for i := range tx.Outputs {
 				outpus = append(outpus, c.wallet.BuildAnnotatedOutput(tx, i))
 			}
 		}
-		txOutputs[block.BlockHeader.Hash()] = outpus
+		txOutputs[txid] = outpus
 
 		bcHash = &block.PreviousBlockHash
 	}
 	return blocks, txOutputs
+}
+
+func (c *ChainCache) BestBlockHeight() uint64 {
+	return c.chain.BestBlockHeight()
 }
 
 func (c *ChainCache) ListAssets(address string) map[string]uint64 {
@@ -111,60 +116,88 @@ func (c *ChainCache) ListAssets(address string) map[string]uint64 {
 	return assets
 }
 
-func (c *ChainCache) ListTransactions(address, assetID string) []*types.Tx {
-	txs := []*types.Tx{}
+func (c *ChainCache) ListTransactions(address, assetID string) []*query.AnnotatedTx {
+	var transactions = []*query.AnnotatedTx{}
 	c.RLock()
 	defer c.RUnlock()
-	for _, block := range c.BlockChain {
-		for _, tx := range block.Transactions {
-			var outpus = []*query.AnnotatedOutput{}
-			for i := range tx.Outputs {
-				outpus = append(outpus, c.wallet.BuildAnnotatedOutput(tx, i))
-			}
-
-			for _, v := range outpus {
-				if v.Address == address && v.AssetID.String() == assetID {
-					txs = append(txs, tx)
-				}
+	for txid, outputs := range c.TransactionsOutputs {
+		for _, tx := range outputs {
+			if tx.Address == address && tx.AssetID.String() == assetID {
+				transaction := c.getTransactionByID(txid.String())
+				transactions = append(transactions, transaction)
 			}
 		}
 	}
 
-	return txs
+	return transactions
 }
 
-func (c *ChainCache) ListTransaction(txID string) map[string]interface{} {
-	var TX = make(map[string]interface{})
-	c.RLock()
-	defer c.RUnlock()
+func (c *ChainCache) getTransactionByID(txID string) *query.AnnotatedTx {
+	var transaction = new(query.AnnotatedTx)
 exit:
-	for _, block := range c.BlockChain {
+	for blockHash, block := range c.BlockChain {
 		for _, tx := range block.Transactions {
-			var inputs = []*query.AnnotatedInput{}
-			var outputs = []*query.AnnotatedOutput{}
 
 			if tx.ID.String() == txID {
+				var inputs = []*query.AnnotatedInput{}
+				var outputs = []*query.AnnotatedOutput{}
+
 				for i := range tx.Inputs {
 					inputs = append(inputs, c.wallet.BuildAnnotatedInput(tx, uint32(i)))
 				}
-
 				for i := range tx.Outputs {
 					outputs = append(outputs, c.wallet.BuildAnnotatedOutput(tx, i))
 				}
-				TX["block"] = block
-				TX["inputs"] = inputs
-				TX["outputs"] = outputs
+
+				transaction.BlockID = blockHash
+				transaction.ID = tx.ID
+				transaction.BlockHeight = block.Height
+				transaction.Timestamp = block.Timestamp
+				transaction.BlockTransactionsCount = uint32(len(block.Transactions))
+				transaction.Inputs = inputs
+				transaction.Outputs = outputs
+				transaction.StatusFail = false
 				break exit
 			}
 		}
 	}
 
-	return TX
+	return transaction
 }
+
+//
+//func (c *ChainCache) ListTransaction(txID string) map[string]interface{} {
+//	var TX = make(map[string]interface{})
+//	c.RLock()
+//	defer c.RUnlock()
+//exit:
+//	for _, block := range c.BlockChain {
+//		for _, tx := range block.Transactions {
+//			var inputs = []*query.AnnotatedInput{}
+//			var outputs = []*query.AnnotatedOutput{}
+//
+//			if tx.ID.String() == txID {
+//				for i := range tx.Inputs {
+//					inputs = append(inputs, c.wallet.BuildAnnotatedInput(tx, uint32(i)))
+//				}
+//
+//				for i := range tx.Outputs {
+//					outputs = append(outputs, c.wallet.BuildAnnotatedOutput(tx, i))
+//				}
+//				TX["block"] = block
+//				TX["inputs"] = inputs
+//				TX["outputs"] = outputs
+//				break exit
+//			}
+//		}
+//	}
+//
+//	return TX
+//}
 
 func (c *ChainCache) Close() {
 	close(c.exitCh)
-	c.BlockChain = []*types.Block{}
+	c.BlockChain = make(map[bc.Hash]*types.Block)
 	c.TransactionsOutputs = make(map[bc.Hash][]*query.AnnotatedOutput)
 }
 

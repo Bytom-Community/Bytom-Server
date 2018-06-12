@@ -6,11 +6,7 @@ import (
 	"net/http"
 
 	"github.com/bytom/chaincache"
-
-	cfg "github.com/bytom/config"
-	"github.com/bytom/protocol"
 	"github.com/bytom/rpc/pb"
-	"github.com/bytom/wallet"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	log "github.com/sirupsen/logrus"
@@ -25,7 +21,7 @@ type Rpc struct {
 	rpcListen string
 }
 
-func NewRpc(wallet *wallet.Wallet, chain *protocol.Chain, config *cfg.Config) *Rpc {
+func NewRpc(chainCache *chaincache.ChainCache) *Rpc {
 	rpcServer := grpc.NewServer()
 	rpc := &Rpc{
 		rpcServer: rpcServer,
@@ -33,7 +29,7 @@ func NewRpc(wallet *wallet.Wallet, chain *protocol.Chain, config *cfg.Config) *R
 
 	api := &ApiService{
 		rpcServer:  rpc,
-		chainCache: chaincache.NewChainCache(nil, nil, nil),
+		chainCache: chainCache,
 	}
 
 	rpcpb.RegisterApiServiceServer(rpcServer, api)

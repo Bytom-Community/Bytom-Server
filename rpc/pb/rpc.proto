@@ -21,7 +21,7 @@ message ListAssetsResponse {
 }
 
 message Asset {
-    string address = 1;
+    string assetID = 1;
     uint64 amount = 2;
 }
 

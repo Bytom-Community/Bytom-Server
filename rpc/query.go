@@ -7,9 +7,9 @@ import (
 
 func (s *ApiService) ListAssets(ctx context.Context, req *rpcpb.ListAssetsRequest) (*rpcpb.ListAssetsResponse, error) {
 	var assets []*rpcpb.Asset
-	for address, amount := range s.chainCache.ListAssets(req.Address) {
+	for assetID, amount := range s.chainCache.ListAssets(req.Address) {
 		asset := &rpcpb.Asset{
-			Address: address,
+			AssetID: assetID,
 			Amount:  amount,
 		}
 		assets = append(assets, asset)

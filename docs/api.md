@@ -28,14 +28,15 @@ curl -d '{"alias":"alice", "password":"alice"}' http://localhost:9888/v1/create-
 **Parameters:**
 ``` json
 {
-    account_id string
+    address string
 }
 ```
 **Returns:**
 ``` base
 assets: [
     {
-        id string
+        address string
+        amount uint64
     }
 ]
 ```
@@ -71,7 +72,7 @@ assets: [
 **Parameters:**
 ``` json
 {
-    account_id string
+    address string
     asset_id   string
 }
 ```

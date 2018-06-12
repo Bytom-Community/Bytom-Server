@@ -41,29 +41,6 @@ assets: [
 ]
 ```
 
-#### 查询资产余额
-| URL | Method | Version |
-|-------|:------------:|:------------:|
-| /v1/list-balances | POST | V1 |
-
-**Parameters:**
-``` json
-{
-    account_id string
-    asset_id   string
-}
-```
-
-**Returns:**
-``` base
-assets: [
-    {
-        amount int
-    }
-]
-```
-
-
 #### 查询资产交易记录
 | URL | Method | Version |
 |-------|:------------:|:------------:|

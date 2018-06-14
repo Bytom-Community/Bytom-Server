@@ -34,7 +34,7 @@ func (s *ApiService) SubmitTransaction(ctx context.Context, req *rpcpb.SubmitTra
 // EstimateTransactionGas estimate transaction gas
 func (s *ApiService) EstimateTransactionGas(ctx context.Context, req *rpcpb.EstimateTransactionGasRequest) (*rpcpb.EstimateTransactionGasResponse, error) {
 	txTemplate := new(txbuilder.Template)
-	if err := json.Unmarshal(req.TransactionTemplate, txTemplate); err != nil {
+	if err := json.Unmarshal([]byte(req.TransactionTemplate), txTemplate); err != nil {
 		return nil, fmt.Errorf("estimate-transaction-gas: %v", err.Error())
 	}
 

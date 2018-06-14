@@ -76,7 +76,7 @@ message SubmitTransactionResponse {
 
 // gas
 message EstimateTransactionGasRequest {
-    bytes transactionTemplate = 1;
+    string transactionTemplate = 1;
 }
 
 message EstimateTransactionGasResponse {

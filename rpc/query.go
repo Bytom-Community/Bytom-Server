@@ -22,6 +22,7 @@ func (s *ApiService) ListTransactions(ctx context.Context, req *rpcpb.ListTransa
 	for _, tx := range s.chainCache.ListTransactions(req.Address, req.AssetID) {
 		var inputs []*rpcpb.Input
 		var outputs []*rpcpb.Output
+		var op string
 
 		for _, v := range tx.Inputs {
 			input := &rpcpb.Input{
@@ -30,6 +31,9 @@ func (s *ApiService) ListTransactions(ctx context.Context, req *rpcpb.ListTransa
 				Amount:        v.Amount,
 				Address:       v.Address,
 				SpentOutputID: v.SpentOutputID.String(),
+			}
+			if input.Address == req.Address {
+				op = "send"
 			}
 			inputs = append(inputs, input)
 		}
@@ -42,6 +46,9 @@ func (s *ApiService) ListTransactions(ctx context.Context, req *rpcpb.ListTransa
 				Address:  v.Address,
 				OutputID: v.OutputID.String(),
 				Position: int32(v.Position),
+			}
+			if output.Address == req.Address {
+				op = "receive"
 			}
 			outputs = append(outputs, output)
 		}
@@ -56,6 +63,7 @@ func (s *ApiService) ListTransactions(ctx context.Context, req *rpcpb.ListTransa
 			StatusFail:             tx.StatusFail,
 			Inputs:                 inputs,
 			Outputs:                outputs,
+			Op:                     op,
 		}
 		transactions = append(transactions, TX)
 	}

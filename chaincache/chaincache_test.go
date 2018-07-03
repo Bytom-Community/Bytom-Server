@@ -68,6 +68,18 @@ func TestListTransactions(t *testing.T) {
 	}
 }
 
+func TestGetTransactionByID(t *testing.T) {
+	stime = time.Now().UnixNano()
+	d := c.getTransactionByID("0ebb5cfd1bc9c9bb2417edf69f61cb68abcd33318293ff4ae18dc7b483f6b941")
+	etime = time.Now().UnixNano()
+	totalTime := (etime - stime) / 1e6
+	if d != nil {
+		t.Log(d.BlockHeight)
+		t.Log(d.BlockID.String())
+		t.Logf("run time: %v ms", totalTime)
+	}
+}
+
 //
 //func TestListTransaction(t *testing.T) {
 //	//height := c.chain.BestBlockHeight()

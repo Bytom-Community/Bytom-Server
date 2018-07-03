@@ -25,7 +25,8 @@ type ChainCache struct {
 	chain               *protocol.Chain
 	wallet              *w.Wallet
 	BlockChain          map[bc.Hash]*types.Block
-	TransactionsOutputs map[bc.Hash][]*query.AnnotatedOutput
+	TransactionsInput   map[string][]*query.AnnotatedInput
+	TransactionsOutputs map[string][]*query.AnnotatedOutput
 	exitCh              chan bool
 }
 
@@ -36,9 +37,7 @@ func NewChainCache(store *leveldb.Store, chain *protocol.Chain, wallet *w.Wallet
 		wallet: wallet,
 		exitCh: make(chan bool),
 	}
-	c.Lock()
 	c.updateChain()
-	c.Unlock()
 
 	go c.syncChainRoutine()
 	return c
@@ -53,9 +52,7 @@ func (c *ChainCache) syncChainRoutine() {
 		case <-c.exitCh:
 			goto exit
 		case <-workTicker.C:
-			c.Lock()
 			c.updateChain()
-			c.Unlock()
 		}
 	}
 exit:
@@ -64,17 +61,21 @@ exit:
 }
 
 func (c *ChainCache) updateChain() {
-	bc, txOutputs := c.readChain()
+	bc, txInput, txOutputs := c.readChain()
+	c.Lock()
 	c.BlockChain = bc
+	c.TransactionsInput = txInput
 	c.TransactionsOutputs = txOutputs
+	c.Unlock()
 }
 
-func (c *ChainCache) readChain() (blocks map[bc.Hash]*types.Block, txOutputs map[bc.Hash][]*query.AnnotatedOutput) {
+func (c *ChainCache) readChain() (blocks map[bc.Hash]*types.Block, txInput map[string][]*query.AnnotatedInput, txOutputs map[string][]*query.AnnotatedOutput) {
 
 	bcHash := c.chain.BestBlockHash()
 	height := c.chain.BestBlockHeight()
 	blocks = make(map[bc.Hash]*types.Block)
-	txOutputs = make(map[bc.Hash][]*query.AnnotatedOutput)
+	txInput = make(map[string][]*query.AnnotatedInput)
+	txOutputs = make(map[string][]*query.AnnotatedOutput)
 
 	for i := height; i > 0; i-- {
 		block, err := c.store.GetBlock(bcHash)
@@ -83,19 +84,24 @@ func (c *ChainCache) readChain() (blocks map[bc.Hash]*types.Block, txOutputs map
 		}
 		blocks[block.Hash()] = block
 
-		var txid bc.Hash
-		var outpus = []*query.AnnotatedOutput{}
 		for _, tx := range block.Transactions {
-			txid = tx.ID
+			var txid = tx.ID.String()
+			var input = []*query.AnnotatedInput{}
+			var outpus = []*query.AnnotatedOutput{}
+
+			for i := range tx.Inputs {
+				input = append(input, c.wallet.BuildAnnotatedInput(tx, uint32(i)))
+			}
 			for i := range tx.Outputs {
 				outpus = append(outpus, c.wallet.BuildAnnotatedOutput(tx, i))
 			}
+			txInput[txid] = input
+			txOutputs[txid] = outpus
 		}
-		txOutputs[txid] = outpus
 
 		bcHash = &block.PreviousBlockHash
 	}
-	return blocks, txOutputs
+	return blocks, txInput, txOutputs
 }
 
 func (c *ChainCache) BestBlockHeight() uint64 {
@@ -120,10 +126,19 @@ func (c *ChainCache) ListTransactions(address, assetID string) []*query.Annotate
 	var transactions = []*query.AnnotatedTx{}
 	c.RLock()
 	defer c.RUnlock()
+	for txid, inputs := range c.TransactionsInput {
+		for _, tx := range inputs {
+			if tx.Address == address && tx.AssetID.String() == assetID {
+				transaction := c.getTransactionByID(txid)
+				transactions = append(transactions, transaction)
+			}
+		}
+	}
+
 	for txid, outputs := range c.TransactionsOutputs {
 		for _, tx := range outputs {
 			if tx.Address == address && tx.AssetID.String() == assetID {
-				transaction := c.getTransactionByID(txid.String())
+				transaction := c.getTransactionByID(txid)
 				transactions = append(transactions, transaction)
 			}
 		}
@@ -198,7 +213,8 @@ exit:
 func (c *ChainCache) Close() {
 	close(c.exitCh)
 	c.BlockChain = make(map[bc.Hash]*types.Block)
-	c.TransactionsOutputs = make(map[bc.Hash][]*query.AnnotatedOutput)
+	c.TransactionsInput = make(map[string][]*query.AnnotatedInput)
+	c.TransactionsOutputs = make(map[string][]*query.AnnotatedOutput)
 }
 
 func (c *ChainCache) FindAssetByAlias(alias string) (*asset.Asset, error) {

@@ -54,6 +54,7 @@ message TX {
     bool statusFail = 8;
     repeated Input inputs = 9;
     repeated Output outputs = 10;
+    string op = 11;
 }
 
 message ListTransactionsRequest {

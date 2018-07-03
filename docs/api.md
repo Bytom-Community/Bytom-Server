@@ -50,7 +50,7 @@ assets: [
 ``` json
 {
     address string
-    asset_id   string
+    assetID   string
 }
 ```
 

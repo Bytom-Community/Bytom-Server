@@ -23,6 +23,7 @@ func (s *ApiService) ListTransactions(ctx context.Context, req *rpcpb.ListTransa
 		var inputs []*rpcpb.Input
 		var outputs []*rpcpb.Output
 		var op string
+		var inAmout, outAmount uint64
 
 		for _, v := range tx.Inputs {
 			input := &rpcpb.Input{
@@ -32,6 +33,7 @@ func (s *ApiService) ListTransactions(ctx context.Context, req *rpcpb.ListTransa
 				Address:       v.Address,
 				SpentOutputID: v.SpentOutputID.String(),
 			}
+			inAmout += input.Amount
 			if input.Address == req.Address {
 				op = "send"
 			}
@@ -47,7 +49,9 @@ func (s *ApiService) ListTransactions(ctx context.Context, req *rpcpb.ListTransa
 				OutputID: v.OutputID.String(),
 				Position: int32(v.Position),
 			}
-			if output.Address == req.Address {
+			outAmount += output.Amount
+			// 排除找零地址
+			if output.Address == req.Address && op == "" {
 				op = "receive"
 			}
 			outputs = append(outputs, output)
@@ -64,6 +68,7 @@ func (s *ApiService) ListTransactions(ctx context.Context, req *rpcpb.ListTransa
 			Inputs:                 inputs,
 			Outputs:                outputs,
 			Op:                     op,
+			Fee:                    inAmout - outAmount,
 		}
 		transactions = append(transactions, TX)
 	}

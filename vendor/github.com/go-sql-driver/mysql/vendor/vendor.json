@@ -1,0 +1,11 @@
+{
+	"comment": "",
+	"ignore": "",
+	"package": [
+		{
+			"path": "appengine/cloudsql",
+			"revision": ""
+		}
+	],
+	"rootPath": "github.com/go-sql-driver/mysql"
+}

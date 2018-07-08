@@ -15,6 +15,7 @@ import (
 	"github.com/bytom/blockchain/txfeed"
 	cfg "github.com/bytom/config"
 	"github.com/bytom/dashboard"
+	"github.com/bytom/db"
 	"github.com/bytom/errors"
 	"github.com/bytom/mining/cpuminer"
 	"github.com/bytom/mining/miningpool"
@@ -84,6 +85,7 @@ type API struct {
 	txFeedTracker *txfeed.Tracker
 	cpuMiner      *cpuminer.CPUMiner
 	miningPool    *miningpool.MiningPool
+	mysqlDB       *db.DB
 }
 
 func (a *API) initServer(config *cfg.Config) {
@@ -141,6 +143,11 @@ func (a *API) StartServer(address string) {
 
 // NewAPI create and initialize the API
 func NewAPI(sync *netsync.SyncManager, wallet *wallet.Wallet, txfeeds *txfeed.Tracker, cpuMiner *cpuminer.CPUMiner, miningPool *miningpool.MiningPool, chain *protocol.Chain, config *cfg.Config, token *accesstoken.CredentialStore) *API {
+	mysqlDB, err := db.NewDB("", "", "", "", "")
+	if err != nil {
+		return nil
+	}
+
 	api := &API{
 		sync:          sync,
 		wallet:        wallet,
@@ -149,6 +156,7 @@ func NewAPI(sync *netsync.SyncManager, wallet *wallet.Wallet, txfeeds *txfeed.Tr
 		txFeedTracker: txfeeds,
 		cpuMiner:      cpuMiner,
 		miningPool:    miningPool,
+		mysqlDB:       mysqlDB,
 	}
 	api.buildHandler()
 	api.initServer(config)

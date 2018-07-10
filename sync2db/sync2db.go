@@ -1,0 +1,172 @@
+package sync2db
+
+import (
+	"strings"
+	"time"
+
+	"github.com/bytom/blockchain/query"
+	"github.com/bytom/database/leveldb"
+	"github.com/bytom/db"
+	"github.com/bytom/protocol"
+	"github.com/bytom/protocol/bc"
+	"github.com/bytom/protocol/bc/types"
+	w "github.com/bytom/wallet"
+
+	log "github.com/sirupsen/logrus"
+	cmn "github.com/tendermint/tmlibs/common"
+)
+
+type Sync2DB struct {
+	store               *leveldb.Store
+	chain               *protocol.Chain
+	wallet              *w.Wallet
+	db                  *db.DB
+	BlockChain          map[bc.Hash]*types.Block
+	TransactionsInput   map[string][]*query.AnnotatedInput
+	TransactionsOutputs map[string][]*query.AnnotatedOutput
+	exitCh              chan bool
+}
+
+func NewSync2DB(store *leveldb.Store, chain *protocol.Chain, wallet *w.Wallet, db *db.DB) *Sync2DB {
+	return &Sync2DB{
+		store:  store,
+		chain:  chain,
+		wallet: wallet,
+		db:     db,
+		exitCh: make(chan bool),
+	}
+}
+
+func (s *Sync2DB) Run() {
+	log.Info("Sync2DB goroutine running")
+	s.runSync()
+	workTicker := time.NewTicker(time.Minute)
+	for {
+		select {
+		case <-s.exitCh:
+			goto exit
+		case <-workTicker.C:
+			s.runSync()
+		}
+	}
+exit:
+	log.Info("Sync2DB goroutine exiting")
+	workTicker.Stop()
+}
+
+func (s *Sync2DB) runSync() {
+	bcHash := s.chain.BestBlockHash()
+	height := s.chain.BestBlockHeight()
+	existCount := 0
+	log.Infof("Sync2DB running sync to db， current height:%v", height)
+
+	for i := height; i > 0; i-- {
+		block, err := s.store.GetBlock(bcHash)
+		if err != nil {
+			cmn.Exit(cmn.Fmt("Failed to get block from store: %v", err))
+		}
+		if existCount >= 3 {
+			return
+		}
+		blockID, err := block.Hash().MarshalText()
+		if err != nil {
+			cmn.Exit(cmn.Fmt("Failed to MarshalText from hash :%v", err))
+		}
+		exist, err := s.db.Engine.Exist(&db.Block{
+			Hash: string(blockID),
+		})
+		if err != nil {
+			cmn.Exit(cmn.Fmt("Failed to get block exist from db: %v", err))
+		}
+		log.Info("current block id:", string(blockID), exist)
+		if !exist {
+			var txIds []string
+			for _, v := range block.Transactions {
+				txIds = append(txIds, v.ID.String())
+			}
+			_, err = s.db.Engine.Insert(&db.Block{
+				Hash:              string(blockID),
+				Version:           block.Version,
+				Height:            block.Height,
+				PreviousBlockHash: block.PreviousBlockHash.String(),
+				Timestamp:         block.Timestamp,
+				Nonce:             block.Nonce,
+				Bits:              block.Bits,
+				TxCount:           len(block.Transactions),
+				TxIds:             strings.Join(txIds, ","),
+			})
+			if err != nil {
+				cmn.Exit(cmn.Fmt("Failed to insert block from db: %v", err))
+			}
+		} else {
+			existCount++
+		}
+
+		for _, tx := range block.Transactions {
+			var txid = tx.ID.String()
+
+			// inputs
+			for i := range tx.Inputs {
+				input := s.wallet.BuildAnnotatedInput(tx, uint32(i))
+				has, err := s.db.Engine.Exist(&db.TxInputs{
+					TxId:          txid,
+					BlockHash:     string(blockID),
+					SpentOutputId: input.SpentOutputID.String(),
+				})
+				if err != nil {
+					cmn.Exit(cmn.Fmt("Failed to exist block from db: %v", err))
+				}
+				assetDefinition, err := input.AssetDefinition.MarshalJSON()
+				if err != nil {
+					cmn.Exit(cmn.Fmt("Failed to get AssetDefinition from json: %v", err))
+				}
+				if !has {
+					s.db.Engine.Insert(&db.TxInputs{
+						TxId:            txid,
+						BlockHash:       string(blockID),
+						Address:         input.Address,
+						AssetId:         input.AssetID.String(),
+						Amount:          input.Amount,
+						AssetDefinition: string(assetDefinition),
+						SpentOutputId:   input.SpentOutputID.String(),
+						Type:            input.Type,
+					})
+				}
+			}
+
+			// outputs
+			for i := range tx.Outputs {
+				output := s.wallet.BuildAnnotatedOutput(tx, i)
+				has, err := s.db.Engine.Exist(&db.TxOutputs{
+					TxId:      txid,
+					BlockHash: string(blockID),
+					OutputId:  output.OutputID.String(),
+				})
+				if err != nil {
+					cmn.Exit(cmn.Fmt("Failed to exist block from db: %v", err))
+				}
+				assetDefinition, err := output.AssetDefinition.MarshalJSON()
+				if err != nil {
+					cmn.Exit(cmn.Fmt("Failed to get AssetDefinition from json: %v", err))
+				}
+				if !has {
+					s.db.Engine.Insert(&db.TxOutputs{
+						TxId:            txid,
+						BlockHash:       string(blockID),
+						Address:         output.Address,
+						AssetId:         output.AssetID.String(),
+						Amount:          output.Amount,
+						AssetDefinition: string(assetDefinition),
+						OutputId:        output.OutputID.String(),
+						Type:            output.Type,
+					})
+				}
+			}
+		}
+		bcHash = &block.PreviousBlockHash
+	}
+}
+
+func (s *Sync2DB) Close() {
+	close(s.exitCh)
+}

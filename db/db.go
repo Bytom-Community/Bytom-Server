@@ -7,7 +7,7 @@ import (
 )
 
 type DB struct {
-	engine  *xorm.Engine
+	Engine  *xorm.Engine
 	Address string
 	Port    string
 	User    string
@@ -23,7 +23,7 @@ func NewDB(addr, user, pass, port, dbname string) (db *DB, err error) {
 	}
 
 	return &DB{
-		engine:  engine,
+		Engine:  engine,
 		Address: addr,
 		Port:    port,
 		User:    user,
@@ -32,5 +32,5 @@ func NewDB(addr, user, pass, port, dbname string) (db *DB, err error) {
 }
 
 func (db *DB) Close() error {
-	return db.engine.Close()
+	return db.Engine.Close()
 }

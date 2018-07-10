@@ -3,6 +3,7 @@ package node
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -21,10 +22,10 @@ import (
 	"github.com/bytom/asset"
 	"github.com/bytom/blockchain/pseudohsm"
 	"github.com/bytom/blockchain/txfeed"
-	"github.com/bytom/chaincache"
 	cfg "github.com/bytom/config"
 	"github.com/bytom/consensus"
 	"github.com/bytom/database/leveldb"
+	"github.com/bytom/db"
 	"github.com/bytom/env"
 	"github.com/bytom/mining/cpuminer"
 	"github.com/bytom/mining/miningpool"
@@ -32,6 +33,7 @@ import (
 	"github.com/bytom/protocol"
 	"github.com/bytom/protocol/bc"
 	"github.com/bytom/rpc"
+	"github.com/bytom/sync2db"
 	"github.com/bytom/types"
 	w "github.com/bytom/wallet"
 )
@@ -57,7 +59,7 @@ type Node struct {
 	api          *api.API
 	rpc          *rpc.Rpc
 	chain        *protocol.Chain
-	chainCache   *chaincache.ChainCache
+	sync2db      *sync2db.Sync2DB
 	txfeed       *txfeed.Tracker
 	cpuMiner     *cpuminer.CPUMiner
 	miningPool   *miningpool.MiningPool
@@ -139,8 +141,16 @@ func NewNode(config *cfg.Config) *Node {
 		}()
 	}
 
-	// chainCache
-	chainCache := chaincache.NewChainCache(store, chain, wallet)
+	// init db
+	fmt.Println("========", config.MysqlAddr)
+	d, err := db.NewDB(config.MysqlAddr, config.MysqlUser, config.MysqlPass, config.MysqlPort, config.MysqlDBName)
+	if err != nil {
+		cmn.Exit(cmn.Fmt("initialize db failed: %v", err))
+	}
+	syc := sync2db.NewSync2DB(store, chain, wallet, d)
+	go func(s *sync2db.Sync2DB) {
+		s.Run()
+	}(syc)
 
 	node := &Node{
 		config:       config,
@@ -149,7 +159,7 @@ func NewNode(config *cfg.Config) *Node {
 		accessTokens: accessTokens,
 		wallet:       wallet,
 		chain:        chain,
-		chainCache:   chainCache,
+		sync2db:      syc,
 		txfeed:       txFeed,
 		miningEnable: config.Mining,
 	}
@@ -202,21 +212,12 @@ func launchWebBrowser() {
 	}
 }
 
-//func (n *Node) initAndstartApiServer() {
-//	n.api = api.NewAPI(n.syncManager, n.wallet, n.txfeed, n.cpuMiner, n.miningPool, n.chain, n.config, n.accessTokens)
-//
-//	listenAddr := env.String("LISTEN", n.config.ApiAddress)
-//	env.Parse()
-//	n.api.StartServer(*listenAddr)
-//}
+func (n *Node) initAndstartApiServer() {
+	n.api = api.NewAPI(n.syncManager, n.wallet, n.txfeed, n.cpuMiner, n.miningPool, n.chain, n.config, n.accessTokens)
 
-func (n *Node) initAndstartRpcServer() {
-	n.rpc = rpc.NewRpc(n.chainCache)
-
-	api_addr := env.String("LISTEN", n.config.ApiAddress)
-	rpc_addr := env.String("RPCLISTEN", n.config.RpcAddress)
+	listenAddr := env.String("LISTEN", n.config.ApiAddress)
 	env.Parse()
-	n.rpc.Start(*api_addr, *rpc_addr)
+	n.api.StartServer(*listenAddr)
 }
 
 func (n *Node) OnStart() error {
@@ -226,8 +227,7 @@ func (n *Node) OnStart() error {
 	if !n.config.VaultMode {
 		n.syncManager.Start()
 	}
-	//n.initAndstartApiServer()
-	n.initAndstartRpcServer()
+	n.initAndstartApiServer()
 	if !n.config.Web.Closed {
 		launchWebBrowser()
 	}
@@ -243,8 +243,8 @@ func (n *Node) OnStop() {
 	if !n.config.VaultMode {
 		n.syncManager.Stop()
 	}
-	if n.chainCache != nil {
-		n.chainCache.Close()
+	if n.sync2db != nil {
+		n.sync2db.Close()
 	}
 }
 

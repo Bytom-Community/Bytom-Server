@@ -24,7 +24,11 @@ var defaultConfigTmpl = `# This is a TOML config file.
 fast_sync = true
 db_backend = "leveldb"
 api_addr = "0.0.0.0:9888"
-rpc_addr = "0.0.0.0:9889"
+mysql_addr = "localhost"
+mysql_port = "3306"
+mysql_user = "root"
+mysql_pass = "1"
+mysql_name = "btmwallet"
 `
 
 var mainNetConfigTmpl = `chain_id = "mainnet"

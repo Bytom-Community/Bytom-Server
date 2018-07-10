@@ -81,7 +81,12 @@ type BaseConfig struct {
 
 	ApiAddress string `mapstructure:"api_addr"`
 
-	RpcAddress string `mapstructure:"rpc_addr"`
+	// db
+	MysqlAddr   string `mapstructure:"mysql_addr"`
+	MysqlPort   string `mapstructure:"mysql_port"`
+	MysqlUser   string `mapstructure:"mysql_user"`
+	MysqlPass   string `mapstructure:"mysql_pass"`
+	MysqlDBName string `mapstructure:"mysql_name"`
 
 	VaultMode bool `mapstructure:"vault_mode"`
 

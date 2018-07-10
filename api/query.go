@@ -47,9 +47,9 @@ func (a *API) getAsset(ctx context.Context, filter struct {
 
 // POST /list-assets
 func (a *API) listAssets(ctx context.Context, filter struct {
-	ID string `json:"id"`
+	Address string `json:"address"`
 }) Response {
-	assets, err := a.wallet.AssetReg.ListAssets(filter.ID)
+	assets, err := a.mysqlDB.GetAssetsByAddress(filter.Address)
 	if err != nil {
 		log.Errorf("listAssets: %v", err)
 		return NewErrorResponse(err)

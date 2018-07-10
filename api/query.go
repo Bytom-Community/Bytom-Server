@@ -49,13 +49,13 @@ func (a *API) getAsset(ctx context.Context, filter struct {
 func (a *API) listAssets(ctx context.Context, filter struct {
 	Address string `json:"address"`
 }) Response {
-	assets, err := a.mysqlDB.GetAssetsByAddress(filter.Address)
-	if err != nil {
-		log.Errorf("listAssets: %v", err)
-		return NewErrorResponse(err)
-	}
-
-	return NewSuccessResponse(assets)
+	//assets, err := a.mysqlDB.GetAssetsByAddress(filter.Address)
+	//if err != nil {
+	//	log.Errorf("listAssets: %v", err)
+	//	return NewErrorResponse(err)
+	//}
+	//
+	return NewSuccessResponse(nil)
 }
 
 // POST /list-balances

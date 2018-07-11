@@ -80,6 +80,36 @@ func TestGetTransactionByID(t *testing.T) {
 	}
 }
 
+func TestCount(t *testing.T) {
+	address := "bm1q5p9d4gelfm4cc3zq3slj7vh2njx23ma2cf866j"
+	assetID := "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+	inputCount, outputCount := 0, 0
+
+	for txid, inputs := range c.TransactionsInput {
+		for _, tx := range inputs {
+			if tx.Address == address && tx.AssetID.String() == assetID {
+				t.Log("input: ", txid)
+				inputCount++
+			}
+		}
+	}
+
+	for txid, outputs := range c.TransactionsOutputs {
+		for _, tx := range outputs {
+			if tx.Address == address && tx.AssetID.String() == assetID {
+				t.Log("output: ", txid)
+				outputCount++
+			}
+		}
+	}
+	t.Log("inputCount:", inputCount)
+	t.Log("outputCount:", outputCount)
+
+	t.Log("BlockChain:", len(c.BlockChain))
+	t.Log("TransactionsInput:", len(c.TransactionsInput))
+	t.Log("TransactionsOutputs:", len(c.TransactionsOutputs))
+}
+
 //
 //func TestListTransaction(t *testing.T) {
 //	//height := c.chain.BestBlockHeight()

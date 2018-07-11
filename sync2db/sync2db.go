@@ -4,12 +4,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytom/blockchain/query"
 	"github.com/bytom/database/leveldb"
 	"github.com/bytom/db"
 	"github.com/bytom/protocol"
-	"github.com/bytom/protocol/bc"
-	"github.com/bytom/protocol/bc/types"
 	w "github.com/bytom/wallet"
 
 	log "github.com/sirupsen/logrus"
@@ -17,13 +14,10 @@ import (
 )
 
 type Sync2DB struct {
-	store               *leveldb.Store
-	chain               *protocol.Chain
-	wallet              *w.Wallet
-	BlockChain          map[bc.Hash]*types.Block
-	TransactionsInput   map[string][]*query.AnnotatedInput
-	TransactionsOutputs map[string][]*query.AnnotatedOutput
-	exitCh              chan bool
+	store  *leveldb.Store
+	chain  *protocol.Chain
+	wallet *w.Wallet
+	exitCh chan bool
 }
 
 func NewSync2DB(store *leveldb.Store, chain *protocol.Chain, wallet *w.Wallet) *Sync2DB {
@@ -76,7 +70,7 @@ func (s *Sync2DB) runSync() {
 		if err != nil {
 			cmn.Exit(cmn.Fmt("Failed to get block exist from db: %v", err))
 		}
-		log.Info("current block id:", string(blockID), exist)
+		log.Info("current sync2db block id:", string(blockID))
 		if !exist {
 			var txIds []string
 			for _, v := range block.Transactions {
@@ -109,7 +103,10 @@ func (s *Sync2DB) runSync() {
 				has, err := db.Engine.Exist(&db.TxInputs{
 					TxId:          txid,
 					BlockHash:     string(blockID),
+					Address:       input.Address,
+					AssetId:       input.AssetID.String(),
 					SpentOutputId: input.SpentOutputID.String(),
+					Type:          input.Type,
 				})
 				if err != nil {
 					cmn.Exit(cmn.Fmt("Failed to exist block from db: %v", err))
@@ -119,7 +116,7 @@ func (s *Sync2DB) runSync() {
 					cmn.Exit(cmn.Fmt("Failed to get AssetDefinition from json: %v", err))
 				}
 				if !has {
-					db.Engine.Insert(&db.TxInputs{
+					_, err = db.Engine.Insert(&db.TxInputs{
 						TxId:            txid,
 						BlockHash:       string(blockID),
 						Address:         input.Address,
@@ -129,6 +126,9 @@ func (s *Sync2DB) runSync() {
 						SpentOutputId:   input.SpentOutputID.String(),
 						Type:            input.Type,
 					})
+					if err != nil {
+						cmn.Exit(cmn.Fmt("Failed to insert inputs from db: %v", err))
+					}
 				}
 			}
 
@@ -138,7 +138,10 @@ func (s *Sync2DB) runSync() {
 				has, err := db.Engine.Exist(&db.TxOutputs{
 					TxId:      txid,
 					BlockHash: string(blockID),
+					Address:   output.Address,
+					AssetId:   output.AssetID.String(),
 					OutputId:  output.OutputID.String(),
+					Type:      output.Type,
 				})
 				if err != nil {
 					cmn.Exit(cmn.Fmt("Failed to exist block from db: %v", err))
@@ -148,7 +151,7 @@ func (s *Sync2DB) runSync() {
 					cmn.Exit(cmn.Fmt("Failed to get AssetDefinition from json: %v", err))
 				}
 				if !has {
-					db.Engine.Insert(&db.TxOutputs{
+					_, err = db.Engine.Insert(&db.TxOutputs{
 						TxId:            txid,
 						BlockHash:       string(blockID),
 						Address:         output.Address,
@@ -158,6 +161,9 @@ func (s *Sync2DB) runSync() {
 						OutputId:        output.OutputID.String(),
 						Type:            output.Type,
 					})
+					if err != nil {
+						cmn.Exit(cmn.Fmt("Failed to insert outputs from db: %v", err))
+					}
 				}
 			}
 		}

@@ -3,7 +3,6 @@ package node
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -142,12 +141,14 @@ func NewNode(config *cfg.Config) *Node {
 	}
 
 	// init db
-	fmt.Println("========", config.MysqlAddr)
-	d, err := db.NewDB(config.MysqlAddr, config.MysqlUser, config.MysqlPass, config.MysqlPort, config.MysqlDBName)
+	err = db.NewDB(config.MysqlAddr, config.MysqlUser, config.MysqlPass, config.MysqlPort, config.MysqlDBName)
 	if err != nil {
 		cmn.Exit(cmn.Fmt("initialize db failed: %v", err))
 	}
-	syc := sync2db.NewSync2DB(store, chain, wallet, d)
+	if !db.IsInit() {
+		cmn.Exit(cmn.Fmt("initialize db failed"))
+	}
+	syc := sync2db.NewSync2DB(store, chain, wallet)
 	go func(s *sync2db.Sync2DB) {
 		s.Run()
 	}(syc)

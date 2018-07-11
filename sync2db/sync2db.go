@@ -20,19 +20,17 @@ type Sync2DB struct {
 	store               *leveldb.Store
 	chain               *protocol.Chain
 	wallet              *w.Wallet
-	db                  *db.DB
 	BlockChain          map[bc.Hash]*types.Block
 	TransactionsInput   map[string][]*query.AnnotatedInput
 	TransactionsOutputs map[string][]*query.AnnotatedOutput
 	exitCh              chan bool
 }
 
-func NewSync2DB(store *leveldb.Store, chain *protocol.Chain, wallet *w.Wallet, db *db.DB) *Sync2DB {
+func NewSync2DB(store *leveldb.Store, chain *protocol.Chain, wallet *w.Wallet) *Sync2DB {
 	return &Sync2DB{
 		store:  store,
 		chain:  chain,
 		wallet: wallet,
-		db:     db,
 		exitCh: make(chan bool),
 	}
 }
@@ -72,7 +70,7 @@ func (s *Sync2DB) runSync() {
 		if err != nil {
 			cmn.Exit(cmn.Fmt("Failed to MarshalText from hash :%v", err))
 		}
-		exist, err := s.db.Engine.Exist(&db.Block{
+		exist, err := db.Engine.Exist(&db.Block{
 			Hash: string(blockID),
 		})
 		if err != nil {
@@ -84,7 +82,7 @@ func (s *Sync2DB) runSync() {
 			for _, v := range block.Transactions {
 				txIds = append(txIds, v.ID.String())
 			}
-			_, err = s.db.Engine.Insert(&db.Block{
+			_, err = db.Engine.Insert(&db.Block{
 				Hash:              string(blockID),
 				Version:           block.Version,
 				Height:            block.Height,
@@ -108,7 +106,7 @@ func (s *Sync2DB) runSync() {
 			// inputs
 			for i := range tx.Inputs {
 				input := s.wallet.BuildAnnotatedInput(tx, uint32(i))
-				has, err := s.db.Engine.Exist(&db.TxInputs{
+				has, err := db.Engine.Exist(&db.TxInputs{
 					TxId:          txid,
 					BlockHash:     string(blockID),
 					SpentOutputId: input.SpentOutputID.String(),
@@ -121,7 +119,7 @@ func (s *Sync2DB) runSync() {
 					cmn.Exit(cmn.Fmt("Failed to get AssetDefinition from json: %v", err))
 				}
 				if !has {
-					s.db.Engine.Insert(&db.TxInputs{
+					db.Engine.Insert(&db.TxInputs{
 						TxId:            txid,
 						BlockHash:       string(blockID),
 						Address:         input.Address,
@@ -137,7 +135,7 @@ func (s *Sync2DB) runSync() {
 			// outputs
 			for i := range tx.Outputs {
 				output := s.wallet.BuildAnnotatedOutput(tx, i)
-				has, err := s.db.Engine.Exist(&db.TxOutputs{
+				has, err := db.Engine.Exist(&db.TxOutputs{
 					TxId:      txid,
 					BlockHash: string(blockID),
 					OutputId:  output.OutputID.String(),
@@ -150,7 +148,7 @@ func (s *Sync2DB) runSync() {
 					cmn.Exit(cmn.Fmt("Failed to get AssetDefinition from json: %v", err))
 				}
 				if !has {
-					s.db.Engine.Insert(&db.TxOutputs{
+					db.Engine.Insert(&db.TxOutputs{
 						TxId:            txid,
 						BlockHash:       string(blockID),
 						Address:         output.Address,

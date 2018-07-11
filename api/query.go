@@ -9,6 +9,7 @@ import (
 	"github.com/bytom/account"
 	"github.com/bytom/blockchain/query"
 	"github.com/bytom/consensus"
+	"github.com/bytom/db"
 	chainjson "github.com/bytom/encoding/json"
 	"github.com/bytom/protocol/bc"
 	"github.com/bytom/protocol/bc/types"
@@ -49,13 +50,13 @@ func (a *API) getAsset(ctx context.Context, filter struct {
 func (a *API) listAssets(ctx context.Context, filter struct {
 	Address string `json:"address"`
 }) Response {
-	//assets, err := a.mysqlDB.GetAssetsByAddress(filter.Address)
-	//if err != nil {
-	//	log.Errorf("listAssets: %v", err)
-	//	return NewErrorResponse(err)
-	//}
-	//
-	return NewSuccessResponse(nil)
+	assets, err := db.GetAssetsByAddress(filter.Address)
+	if err != nil {
+		log.Errorf("listAssets: %v", err)
+		return NewErrorResponse(err)
+	}
+
+	return NewSuccessResponse(assets)
 }
 
 // POST /list-balances

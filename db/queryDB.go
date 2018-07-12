@@ -166,16 +166,15 @@ func (mydb *DB) GetTransaction(Tx map[string]string, address, AssetID string) ([
 			NewOutputs = append(NewOutputs, output)
 		}
 		// select  transaction from block where block_hash=?;
-		err = mydb.Engine.Select("*").Where("hash = ?", block_hash).Find(&block)
+		Txblock := new(Block)
+		result, err := mydb.Engine.Where("hash = ?", block_hash).Get(Txblock)
 		if err != nil {
-			fmt.Println(err)
 			return nil, err
 		}
 		//block should be unique one
-		if len(block) != 1 {
-			return nil, errors.New("Error happened when get  block from block_hash.The  return block value is not one value. There are  " + string(len(block)) + "  value with block_hash:" + block_hash)
+		if result == false {
+			return nil, errors.New("Can not get  block from database with block_hash:" + block_hash)
 		}
-		Txblock := block[0]
 		BlockTx := &TX{
 			ID:                     TxID,
 			Timestamp:              Txblock.Timestamp,

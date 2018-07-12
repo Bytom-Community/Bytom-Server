@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"errors"
 	"strings"
-	"github.com/Bytom-Server/rpc/pb"
 )
 
 const BTMAssetID = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
@@ -14,7 +13,38 @@ var outputs []TxOutputs
 var inputs []TxInputs
 var block []Block
 
-func (mydb *DB) GetTransactions(address, AssetID string) ([]*rpcpb.TX, error) {
+type TX struct {
+	ID                     string    `json:"ID,omitempty"`
+	Timestamp              uint64    `json:"timestamp,omitempty"`
+	BlockID                string    `json:"blockID,omitempty"`
+	BlockHeight            uint64    `json:"blockHeight,omitempty"`
+	Position               uint32    `json:"position,omitempty"`
+	BlockTransactionsCount uint32    `json:"blockTransactionsCount,omitempty"`
+	Confirmation           uint64    `json:"confirmation,omitempty"`
+	StatusFail             bool      `json:"statusFail,omitempty"`
+	Inputs                 []*Input  `json:"inputs,omitempty"`
+	Outputs                []*Output `json:"outputs,omitempty"`
+	Op                     string    `json:"op,omitempty"`
+	Fee                    uint64    `json:"fee,omitempty"`
+}
+
+// transactions
+type Input struct {
+	Type          string `json:"type,omitempty"`
+	AssetID       string `json:"assetID,omitempty"`
+	Amount        uint64 `json:"amount,omitempty"`
+	Address       string `json:"address,omitempty"`
+	SpentOutputID string `json:"spentOutputID,omitempty"`
+}
+type Output struct {
+	Type     string `json:"type,omitempty"`
+	AssetID  string `json:"assetID,omitempty"`
+	Amount   uint64 ` json:"amount,omitempty"`
+	Address  string `json:"address,omitempty"`
+	OutputID string `json:"OutputID,omitempty"`
+}
+
+func (mydb *DB) GetTransactions(address, AssetID string) ([]*TX, error) {
 	TxIn := make(map[string]string)
 	TxIn, err := mydb.GetTxIn(address, AssetID)
 
@@ -25,7 +55,7 @@ func (mydb *DB) GetTransactions(address, AssetID string) ([]*rpcpb.TX, error) {
 		TxIn[k] = v
 	}
 	Tx := TxIn
-	Transactions, err := mydb.GetTransaction(Tx)
+	Transactions, err := mydb.GetTransaction(Tx, address, AssetID)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -73,15 +103,17 @@ func (mydb *DB) GetTxIn(address string, assetID string) (map[string]string, erro
 	}
 	return TxIn, nil
 }
-func (mydb *DB) GetTransaction(Tx map[string]string) ([]*rpcpb.TX, error) {
-	Transactions := []*rpcpb.TX{}
+func (mydb *DB) GetTransaction(Tx map[string]string, address, AssetID string) ([]*TX, error) {
+	Transactions := []*TX{}
 	BestBlockHeight, err := mydb.GetBestBlockHeight()
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
+	var op string
 	for TxID, block_hash := range Tx {
 		//initial input,output,block nil
+		op = ""
 		inputs = nil
 		outputs = nil
 		block = nil
@@ -91,10 +123,10 @@ func (mydb *DB) GetTransaction(Tx map[string]string) ([]*rpcpb.TX, error) {
 			fmt.Println(err)
 			return nil, err
 		}
-		NewInputs := []*rpcpb.Input{}
+		NewInputs := []*Input{}
 		Amount := uint64(0)
 		for i := range inputs {
-			input := &rpcpb.Input{
+			input := &Input{
 				Address:       inputs[i].Address,
 				AssetID:       inputs[i].AssetId,
 				Amount:        inputs[i].Amount,
@@ -103,6 +135,9 @@ func (mydb *DB) GetTransaction(Tx map[string]string) ([]*rpcpb.TX, error) {
 			}
 			if strings.EqualFold(inputs[i].AssetId, BTMAssetID) {
 				Amount += inputs[i].Amount
+			}
+			if input.Address == address {
+				op = "send"
 			}
 			NewInputs = append(NewInputs, input)
 		}
@@ -113,9 +148,9 @@ func (mydb *DB) GetTransaction(Tx map[string]string) ([]*rpcpb.TX, error) {
 			fmt.Println(err)
 			return nil, err
 		}
-		NewOutputs := []*rpcpb.Output{}
+		NewOutputs := []*Output{}
 		for i := range outputs {
-			output := &rpcpb.Output{
+			output := &Output{
 				Address:  outputs[i].Address,
 				AssetID:  outputs[i].AssetId,
 				Amount:   outputs[i].Amount,
@@ -124,6 +159,9 @@ func (mydb *DB) GetTransaction(Tx map[string]string) ([]*rpcpb.TX, error) {
 			}
 			if strings.EqualFold(outputs[i].AssetId, BTMAssetID) {
 				Amount -= outputs[i].Amount
+			}
+			if output.Address == address && op == "" {
+				op = "receive"
 			}
 			NewOutputs = append(NewOutputs, output)
 		}
@@ -138,13 +176,14 @@ func (mydb *DB) GetTransaction(Tx map[string]string) ([]*rpcpb.TX, error) {
 			return nil, errors.New("Error happened when get  block from block_hash.The  return block value is not one value. There are  " + string(len(block)) + "  value with block_hash:" + block_hash)
 		}
 		Txblock := block[0]
-		BlockTx := &rpcpb.TX{
+		BlockTx := &TX{
 			ID:                     Txblock.TxIds,
 			Timestamp:              Txblock.Timestamp,
 			BlockHeight:            Txblock.Height,
 			BlockID:                Txblock.Hash,
 			BlockTransactionsCount: uint32(Txblock.TxCount),
 			Confirmation:           BestBlockHeight - Txblock.Height,
+			Op:                     op,
 			Fee:                    Amount,
 			Inputs:                 NewInputs,
 			Outputs:                NewOutputs,

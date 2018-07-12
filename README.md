@@ -21,7 +21,7 @@ $ make bytomd    # build bytomd
 
 ```bash
 $ cd ./cmd/bytomd
-$ ./bytomd init --chain_id testnet
+$ ./bytomd init --chain_id mainnet
 
 ```
 

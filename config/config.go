@@ -62,6 +62,8 @@ type BaseConfig struct {
 
 	Mining bool `mapstructure:"mining"`
 
+	Sync2DB bool `mapstructure:"sync_to_db"`
+
 	FilterPeers bool `mapstructure:"filter_peers"` // false
 
 	// What indexer to use for transactions
@@ -104,6 +106,7 @@ func DefaultBaseConfig() BaseConfig {
 		FastSync:          true,
 		FilterPeers:       false,
 		Mining:            false,
+		Sync2DB:           false,
 		TxIndex:           "kv",
 		DBBackend:         "leveldb",
 		DBPath:            "data",

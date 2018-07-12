@@ -32,6 +32,6 @@ $ ./bytomd node --web.closed --sync_to_db
 
 ## 启动api节点
 ```
-$ ./bytomd node --web.closed --sync_to_db
+$ ./bytomd node --web.closed
 
 ```

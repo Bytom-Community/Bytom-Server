@@ -177,7 +177,7 @@ func (mydb *DB) GetTransaction(Tx map[string]string, address, AssetID string) ([
 		}
 		Txblock := block[0]
 		BlockTx := &TX{
-			ID:                     Txblock.TxIds,
+			ID:                     TxID,
 			Timestamp:              Txblock.Timestamp,
 			BlockHeight:            Txblock.Height,
 			BlockID:                Txblock.Hash,

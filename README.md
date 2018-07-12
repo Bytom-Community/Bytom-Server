@@ -6,6 +6,12 @@ Bytom Wallet
 ## 架构
 ![aaa](https://github.com/Bytom-Community/Bytom-Server/blob/master/architecture.jpg)
 
+## 下载bytom
+``` bash
+$ git clone https://github.com/Bytom-Community/Bytom-Server.git $GOPATH/src/github.com/bytom
+$ cd $GOPATH/src/github.com/bytom
+```
+
 ## 安装编译bytomd
 ``` bash
 $ make bytomd    # build bytomd

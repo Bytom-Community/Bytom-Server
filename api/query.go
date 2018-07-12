@@ -50,12 +50,18 @@ func (a *API) getAsset(ctx context.Context, filter struct {
 func (a *API) listAssets(ctx context.Context, filter struct {
 	Address string `json:"address"`
 }) Response {
-	assets, err := db.GetAssetsByAddress(filter.Address)
+	assets := make(map[string]uint64)
+	var outputs []db.TxOutputs
+
+	err := db.Engine.Select("asset_id, sum(amount) as amount").Where("address = ?", filter.Address).GroupBy("asset_id").Find(&outputs)
 	if err != nil {
 		log.Errorf("listAssets: %v", err)
 		return NewErrorResponse(err)
 	}
 
+	for i := range outputs {
+		assets[outputs[i].AssetId] = outputs[i].Amount
+	}
 	return NewSuccessResponse(assets)
 }
 

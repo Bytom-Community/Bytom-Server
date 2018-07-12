@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	log "github.com/sirupsen/logrus"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/bytom/consensus"
 	"github.com/bytom/db"
 	chainjson "github.com/bytom/encoding/json"
+	"github.com/bytom/errors"
 	"github.com/bytom/protocol/bc"
 	"github.com/bytom/protocol/bc/types"
 )
@@ -87,31 +89,173 @@ func (a *API) getTransaction(ctx context.Context, txInfo struct {
 	return NewSuccessResponse(transaction)
 }
 
+// TxResponse for list-transactions response
+type TxResponse struct {
+	ID                     string          `json:"id"`
+	Timestamp              uint64          `json:"timestamp"`
+	BlockID                string          `json:"block_id"`
+	BlockHeight            uint64          `json:"block_height"`
+	BlockTransactionsCount uint32          `json:"block_transaction_count"`
+	Confirmation           uint64          `json:"confirmation"`
+	StatusFail             bool            `json:"status_fail"`
+	Inputs                 []*db.TxInputs  `json:"inputs"`
+	Outputs                []*db.TxOutputs `json:"outputs"`
+	Op                     string          `json:"op"`
+	Fee                    uint64          `json:"fee"`
+}
+
 // POST /list-transactions
 func (a *API) listTransactions(ctx context.Context, filter struct {
-	ID        string `json:"id"`
-	AccountID string `json:"account_id"`
-	Detail    bool   `json:"detail"`
+	Address    string `json:"address"`
+	AssetID    string `json:"asset_id"`
+	PageNumber int64  `json:"page_number"`
+	PageSize   int64  `json:"page_size"`
 }) Response {
-	transactions := []*query.AnnotatedTx{}
+	var (
+		transactions    []*TxResponse
+		blocks          []*db.Block
+		blockHashs      []string
+		blocksMap       map[string]*db.Block
+		inputsMap       map[string][]*db.TxInputs
+		outputsMap      map[string][]*db.TxOutputs
+		txIDsMap        map[string]string // key:tx_id  value:block_hash
+		txIDs           []string
+		err             error
+		bestBlockHeight uint64
+	)
+
+	if bestBlockHeight, err = getBestBlockHeight(); err != nil {
+		log.Errorf("list-transactions: %v", err)
+		return NewErrorResponse(errors.New("list-transaction err"))
+	}
+
+	if txIDsMap, txIDs, err = getTxIDAndBlockHash(filter.Address, filter.AssetID); err != nil {
+		log.Errorf("list-transactions: %v", err)
+		return NewErrorResponse(errors.New("list-transaction err"))
+	}
+
+	// 分页
+	sort.Strings(txIDs)
+	total := int64(len(txIDs))
+	start := filter.PageNumber * filter.PageSize
+	end := start + filter.PageSize
+	if start >= total {
+		return NewErrorResponse(errors.New("page params out of range"))
+	}
+	if end >= total {
+		end = total - 1
+	}
+	returnTxIDs := txIDs[start:end]
+
+	// 获取相关的block
+	for i := range returnTxIDs {
+		blocksMap[txIDsMap[returnTxIDs[i]]] = nil
+	}
+	for k := range blocksMap {
+		blockHashs = append(blockHashs, k)
+	}
+
+	if err = db.Engine.In("hash", blockHashs).Find(&blocks); err != nil {
+		log.Errorf("list-transactions: %v", err)
+		return NewErrorResponse(errors.New("list-transaction err"))
+	}
+	for i := range blocks {
+		blocksMap[blocks[i].Hash] = blocks[i]
+	}
+
+	// 获取结果
+	for _, txID := range returnTxIDs {
+		var op string
+		var inAmount, outAmount uint64
+		var inputs []*db.TxInputs
+		var outputs []*db.TxOutputs
+
+		// FIXME: 查询需优化
+		if err = db.Engine.Where("tx_id = ?", txID).Find(&inputs); err != nil {
+			log.Errorf("list-transactions: %v", err)
+			continue
+		}
+
+		if err = db.Engine.Where("tx_id = ?", txID).Find(&outputs); err != nil {
+			log.Errorf("list-transactions: %v", err)
+			continue
+		}
+
+		for i := range inputs {
+			inAmount += inputs[i].Amount
+			if inputs[i].Address == filter.Address {
+				op = "send"
+			}
+		}
+
+		for i := range outputs {
+			outAmount += outputs[i].Amount
+			// 排除找零地址
+			if outputs[i].Address == filter.Address && op == "" {
+				op = "receive"
+			}
+		}
+
+		blockHash := txIDsMap[txID]
+		txResp := &TxResponse{
+			ID:                     txID,
+			Timestamp:              blocksMap[blockHash].Timestamp,
+			BlockID:                blockHash,
+			BlockHeight:            blocksMap[blockHash].Height,
+			BlockTransactionsCount: uint32(blocksMap[blockHash].TxCount),
+			Confirmation:           bestBlockHeight - blocksMap[blockHash].Height,
+			StatusFail:             false,
+			Inputs:                 inputsMap[txID],
+			Outputs:                outputsMap[txID],
+			Op:                     op,
+			Fee:                    inAmount - outAmount, // FIXME
+		}
+		transactions = append(transactions, txResp)
+	}
+
+	return NewSuccessResponse(transactions)
+}
+
+func getTxIDAndBlockHash(address, assetID string) (map[string]string, []string, error) {
+	var inputs []*db.TxInputs
+	var outputs []*db.TxOutputs
+	var txIDsMap map[string]string
+	var txIDs []string
 	var err error
 
-	if filter.AccountID != "" {
-		transactions, err = a.wallet.GetTransactionsByAccountID(filter.AccountID)
-	} else {
-		transactions, err = a.wallet.GetTransactionsByTxID(filter.ID)
+	if err = db.Engine.Select("tx_id, block_hash").Where("address = ? and asset_id = ?", address, assetID).Find(&inputs); err != nil {
+		return nil, nil, err
 	}
 
-	if err != nil {
-		log.Errorf("listTransactions: %v", err)
-		return NewErrorResponse(err)
+	if err = db.Engine.Select("tx_id, block_hash").Where("address = ? and asset_id = ?", address, assetID).Find(&outputs); err != nil {
+		return nil, nil, err
 	}
 
-	if filter.Detail == false {
-		txSummary := a.wallet.GetTransactionsSummary(transactions)
-		return NewSuccessResponse(txSummary)
+	for i := range inputs {
+		if _, ok := txIDsMap[inputs[i].TxId]; !ok {
+			txIDsMap[inputs[i].TxId] = inputs[i].BlockHash
+			txIDs = append(txIDs, inputs[i].TxId)
+		}
 	}
-	return NewSuccessResponse(transactions)
+
+	for i := range outputs {
+		if _, ok := txIDsMap[outputs[i].TxId]; !ok {
+			txIDsMap[outputs[i].TxId] = outputs[i].BlockHash
+			txIDs = append(txIDs, outputs[i].TxId)
+		}
+	}
+
+	return txIDsMap, txIDs, nil
+}
+
+func getBestBlockHeight() (uint64, error) {
+	var heightBlcok db.Block
+	if _, err := db.Engine.Select("max(height) as height").Get(&heightBlcok); err != nil {
+		log.Errorf("list-transactions: %v", err)
+		return 0, err
+	}
+
+	return heightBlcok.Height, nil
 }
 
 // POST /get-unconfirmed-transaction

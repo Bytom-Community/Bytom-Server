@@ -137,13 +137,10 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 	// 分页
 	sort.Strings(txIDs)
 	total := int64(len(txIDs))
-	start := filter.PageNumber * filter.PageSize
-	end := start + filter.PageSize
-	if start >= total {
-		return NewErrorResponse(errors.New("page params out of range"))
-	}
-	if end >= total {
-		end = total - 1
+	start, end, err := getPagination(total, filter.PageNumber, filter.PageSize)
+	if err != nil {
+		log.Errorf("list-transactions: %v", err)
+		return NewErrorResponse(err)
 	}
 	returnTxIDs := txIDs[start:end]
 
@@ -214,6 +211,19 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 	}
 
 	return NewSuccessResponse(transactions)
+}
+
+func getPagination(total, pageNumber, pageSize int64) (int64, int64, error) {
+	start := pageNumber * pageSize
+	end := start + pageSize
+	if start >= total {
+		return 0, 0, errors.New("page params out of range")
+	}
+	if end >= total {
+		end = total - 1
+	}
+
+	return start, end, nil
 }
 
 func getTxIDAndBlockHash(address, assetID string) (map[string]string, []string, error) {

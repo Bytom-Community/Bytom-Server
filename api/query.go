@@ -217,31 +217,26 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 }
 
 func getTxIDAndBlockHash(address, assetID string) (map[string]string, []string, error) {
-	var inputs []*db.TxInputs
-	var outputs []*db.TxOutputs
 	var txIDsMap map[string]string
 	var txIDs []string
 	var err error
 
-	if err = db.Engine.Select("tx_id, block_hash").Where("address = ? and asset_id = ?", address, assetID).Find(&inputs); err != nil {
+	sql := `
+		select tx_id, block_hash from tx_inputs where address = ? and asset_id = ? 
+		union
+		select tx_id, block_hash form tx_outputs where address = ? and asset_id = ?
+	`
+	result, err := db.Engine.Query(sql, address, assetID, address, assetID)
+	if err != nil {
 		return nil, nil, err
 	}
 
-	if err = db.Engine.Select("tx_id, block_hash").Where("address = ? and asset_id = ?", address, assetID).Find(&outputs); err != nil {
-		return nil, nil, err
-	}
-
-	for i := range inputs {
-		if _, ok := txIDsMap[inputs[i].TxId]; !ok {
-			txIDsMap[inputs[i].TxId] = inputs[i].BlockHash
-			txIDs = append(txIDs, inputs[i].TxId)
-		}
-	}
-
-	for i := range outputs {
-		if _, ok := txIDsMap[outputs[i].TxId]; !ok {
-			txIDsMap[outputs[i].TxId] = outputs[i].BlockHash
-			txIDs = append(txIDs, outputs[i].TxId)
+	for _, row := range result {
+		txID := string(row["tx_id"])
+		blockHash := string(row["block_hash"])
+		if _, ok := txIDsMap[txID]; !ok {
+			txIDsMap[txID] = blockHash
+			txIDs = append(txIDs, txID)
 		}
 	}
 

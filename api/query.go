@@ -116,8 +116,6 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 		blocks          []*db.Block
 		blockHashs      []string
 		blocksMap       map[string]*db.Block
-		inputsMap       map[string][]*db.TxInputs
-		outputsMap      map[string][]*db.TxOutputs
 		txIDsMap        map[string]string // key:tx_id  value:block_hash
 		txIDs           []string
 		err             error
@@ -202,8 +200,8 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 			BlockTransactionsCount: uint32(blocksMap[blockHash].TxCount),
 			Confirmation:           bestBlockHeight - blocksMap[blockHash].Height,
 			StatusFail:             false,
-			Inputs:                 inputsMap[txID],
-			Outputs:                outputsMap[txID],
+			Inputs:                 inputs,
+			Outputs:                outputs,
 			Op:                     op,
 			Fee:                    inAmount - outAmount, // FIXME
 		}

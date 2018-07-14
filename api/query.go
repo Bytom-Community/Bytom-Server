@@ -111,16 +111,15 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 	PageNumber int64  `json:"page_number"`
 	PageSize   int64  `json:"page_size"`
 }) Response {
-	var (
-		transactions    []*TxResponse
-		blocks          []*db.Block
-		blockHashs      []string
-		blocksMap       map[string]*db.Block
-		txIDsMap        map[string]string // key:tx_id  value:block_hash
-		txIDs           []string
-		err             error
-		bestBlockHeight uint64
-	)
+
+	transactions := []*TxResponse{}
+	blocks := []*db.Block{}
+	blockHashs := []string{}
+	blocksMap := map[string]*db.Block{}
+	txIDsMap := map[string]string{} // key:tx_id  value:block_hash
+	txIDs := []string{}
+	var err error
+	var bestBlockHeight uint64
 
 	if bestBlockHeight, err = getBestBlockHeight(); err != nil {
 		log.Errorf("list-transactions: %v", err)
@@ -130,6 +129,11 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 	if txIDsMap, txIDs, err = getTxIDAndBlockHash(filter.Address, filter.AssetID); err != nil {
 		log.Errorf("list-transactions: %v", err)
 		return NewErrorResponse(errors.New("list-transaction err"))
+	}
+
+	if len(txIDs) == 0 {
+		log.Infof("list-transactions: no transactions with address: %v, asset_id: %v", filter.Address, filter.AssetID)
+		return NewSuccessResponse(transactions)
 	}
 
 	// 分页
@@ -212,7 +216,11 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 }
 
 func getPagination(total, pageNumber, pageSize int64) (int64, int64, error) {
-	start := pageNumber * pageSize
+	if pageNumber <= 0 || pageSize <= 0 {
+		return 0, 0, errors.New("page params out of range")
+	}
+
+	start := (pageNumber - 1) * pageSize
 	end := start + pageSize
 	if start >= total {
 		return 0, 0, errors.New("page params out of range")
@@ -225,14 +233,14 @@ func getPagination(total, pageNumber, pageSize int64) (int64, int64, error) {
 }
 
 func getTxIDAndBlockHash(address, assetID string) (map[string]string, []string, error) {
-	var txIDsMap map[string]string
-	var txIDs []string
+	txIDsMap := map[string]string{}
+	txIDs := []string{}
 	var err error
 
 	sql := `
 		select tx_id, block_hash from tx_inputs where address = ? and asset_id = ? 
 		union
-		select tx_id, block_hash form tx_outputs where address = ? and asset_id = ?
+		select tx_id, block_hash from tx_outputs where address = ? and asset_id = ?
 	`
 	result, err := db.Engine.Query(sql, address, assetID, address, assetID)
 	if err != nil {

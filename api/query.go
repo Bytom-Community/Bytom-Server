@@ -203,7 +203,7 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 			Inputs:                 inputs,
 			Outputs:                outputs,
 			Op:                     op,
-			Fee:                    inAmount - outAmount, // FIXME
+			Fee:                    inAmount - outAmount, // 手续费
 		}
 		transactions = append(transactions, txResp)
 	}

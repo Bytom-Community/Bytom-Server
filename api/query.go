@@ -102,6 +102,7 @@ type TxResponse struct {
 	Outputs                []*db.TxOutputs `json:"outputs"`
 	Op                     string          `json:"op"`
 	Fee                    uint64          `json:"fee"`
+	Amount                 uint64          `json:"amount"`
 }
 
 // POST /list-transactions
@@ -195,6 +196,13 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 			}
 		}
 
+		tx := db.Transactions{}
+		has, err := db.Engine.Where("tx_id = ?", txID).Get(&tx)
+		if err != nil || !has {
+			log.Errorf("list-transactions: %v", err)
+			continue
+		}
+
 		blockHash := txIDsMap[txID]
 		txResp := &TxResponse{
 			ID:                     txID,
@@ -208,6 +216,7 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 			Outputs:                outputs,
 			Op:                     op,
 			Fee:                    inAmount - outAmount, // 手续费
+			Amount:                 tx.Amount,
 		}
 		transactions = append(transactions, txResp)
 	}

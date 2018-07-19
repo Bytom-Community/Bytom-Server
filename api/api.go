@@ -143,10 +143,6 @@ func (a *API) StartServer(address string) {
 
 // NewAPI create and initialize the API
 func NewAPI(sync *netsync.SyncManager, wallet *wallet.Wallet, txfeeds *txfeed.Tracker, cpuMiner *cpuminer.CPUMiner, miningPool *miningpool.MiningPool, chain *protocol.Chain, config *cfg.Config, token *accesstoken.CredentialStore) *API {
-	//mysqlDB, err := db.NewDB("", "", "", "", "")
-	//if err != nil {
-	//	return nil
-	//}
 
 	api := &API{
 		sync:          sync,
@@ -156,7 +152,6 @@ func NewAPI(sync *netsync.SyncManager, wallet *wallet.Wallet, txfeeds *txfeed.Tr
 		txFeedTracker: txfeeds,
 		cpuMiner:      cpuMiner,
 		miningPool:    miningPool,
-		//mysqlDB:       mysqlDB,
 	}
 	api.buildHandler()
 	api.initServer(config)

@@ -13,6 +13,7 @@ import (
 	"github.com/bytom/blockchain/txbuilder"
 	"github.com/bytom/consensus"
 	"github.com/bytom/consensus/segwit"
+	"github.com/bytom/db"
 	"github.com/bytom/errors"
 	"github.com/bytom/math/checked"
 	"github.com/bytom/net/http/reqid"
@@ -144,13 +145,26 @@ type submitTxResp struct {
 
 // POST /submit-transaction
 func (a *API) submit(ctx context.Context, ins struct {
-	Tx types.Tx `json:"raw_transaction"`
+	Tx     types.Tx `json:"raw_transaction"`
+	Amount uint64   `json:"amount"`
 }) Response {
 	if err := txbuilder.FinalizeTx(ctx, a.chain, &ins.Tx); err != nil {
 		return NewErrorResponse(err)
 	}
 
 	log.WithField("tx_id", ins.Tx.ID).Info("submit single tx")
+	// write amount to db
+	tx := db.Transactions{
+		TxId:           ins.Tx.ID.String(),
+		BlockHash:      "",
+		Amount:         int64(ins.Amount),
+		Version:        int64(ins.Tx.Version),
+		SerializedSize: int64(ins.Tx.SerializedSize),
+		TimeRange:      int64(ins.Tx.TimeRange),
+	}
+	if _, err := db.Engine.Insert(&tx); err != nil {
+		log.Errorf("Failed write tx amount to db, %v, %v", err, &ins.Tx.ID)
+	}
 	return NewSuccessResponse(&submitTxResp{TxID: &ins.Tx.ID})
 }
 

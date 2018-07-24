@@ -141,15 +141,15 @@ func NewNode(config *cfg.Config) *Node {
 	}
 
 	// init db
+	err = db.NewDB(config.MysqlAddr, config.MysqlUser, config.MysqlPass, config.MysqlPort, config.MysqlDBName)
+	if err != nil {
+		cmn.Exit(cmn.Fmt("initialize db failed: %v", err))
+	}
+	if !db.IsInit() {
+		cmn.Exit(cmn.Fmt("initialize db failed"))
+	}
 	syc := new(sync2db.Sync2DB)
 	if config.Sync2DB {
-		err = db.NewDB(config.MysqlAddr, config.MysqlUser, config.MysqlPass, config.MysqlPort, config.MysqlDBName)
-		if err != nil {
-			cmn.Exit(cmn.Fmt("initialize db failed: %v", err))
-		}
-		if !db.IsInit() {
-			cmn.Exit(cmn.Fmt("initialize db failed"))
-		}
 		syc = sync2db.NewSync2DB(store, chain, wallet)
 		go func(s *sync2db.Sync2DB) {
 			s.Run()

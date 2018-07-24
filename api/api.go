@@ -19,7 +19,6 @@ import (
 	"github.com/bytom/errors"
 	"github.com/bytom/mining/cpuminer"
 	"github.com/bytom/mining/miningpool"
-	"github.com/bytom/net/http/authn"
 	"github.com/bytom/net/http/gzip"
 	"github.com/bytom/net/http/httpjson"
 	"github.com/bytom/net/http/static"
@@ -288,17 +287,17 @@ func webAssetsHandler(next http.Handler) http.Handler {
 
 // AuthHandler access token auth Handler
 func AuthHandler(handler http.Handler, accessTokens *accesstoken.CredentialStore) http.Handler {
-	authenticator := authn.NewAPI(accessTokens)
+	// authenticator := authn.NewAPI(accessTokens)
 
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		// TODO(tessr): check that this path exists; return early if this path isn't legit
-		req, err := authenticator.Authenticate(req)
-		if err != nil {
-			log.WithField("error", errors.Wrap(err, "Serve")).Error("Authenticate fail")
-			err = errors.Sub(errNotAuthenticated, err)
-			errorFormatter.Write(req.Context(), rw, err)
-			return
-		}
+		// req, err := authenticator.Authenticate(req)
+		// if err != nil {
+		// 	log.WithField("error", errors.Wrap(err, "Serve")).Error("Authenticate fail")
+		// 	err = errors.Sub(errNotAuthenticated, err)
+		// 	errorFormatter.Write(req.Context(), rw, err)
+		// 	return
+		// }
 		handler.ServeHTTP(rw, req)
 	})
 }

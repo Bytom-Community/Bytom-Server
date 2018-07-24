@@ -102,7 +102,7 @@ type TxResponse struct {
 	Outputs                []*db.TxOutputs `json:"outputs"`
 	Op                     string          `json:"op"`
 	Fee                    uint64          `json:"fee"`
-	Amount                 int64           `json:"amount"`
+	Amount                 uint64          `json:"amount"`
 }
 
 // POST /list-transactions

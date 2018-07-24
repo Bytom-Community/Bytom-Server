@@ -27,7 +27,7 @@ $ ./bytomd init --chain_id mainnet
 
 ## 启动sync节点
 ```
-$ ./bytomd node --web.closed --sync_to_db
+$ ./bytomd node --root /root/.bytom-sync/ --web.closed --sync_to_db
 ```
 
 ## 启动api节点

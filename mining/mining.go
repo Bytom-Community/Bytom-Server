@@ -20,6 +20,7 @@ import (
 	"github.com/bytom/protocol/state"
 	"github.com/bytom/protocol/validation"
 	"github.com/bytom/protocol/vm/vmutil"
+	"strconv"
 )
 
 // createCoinbaseTx returns a coinbase transaction paying an appropriate subsidy
@@ -39,7 +40,9 @@ func createCoinbaseTx(accountManager *account.Manager, amount uint64, blockHeigh
 	}
 
 	builder := txbuilder.NewBuilder(time.Now())
-	if err = builder.AddInput(types.NewCoinbaseInput([]byte(string(blockHeight))), &txbuilder.SigningInstruction{}); err != nil {
+	if err = builder.AddInput(types.NewCoinbaseInput(
+		append([]byte{0x00}, []byte(strconv.FormatUint(blockHeight, 10))...),
+	), &txbuilder.SigningInstruction{}); err != nil {
 		return
 	}
 	if err = builder.AddOutput(types.NewTxOutput(*consensus.BTMAssetID, amount, script)); err != nil {

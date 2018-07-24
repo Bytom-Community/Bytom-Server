@@ -157,10 +157,9 @@ func (a *API) submit(ctx context.Context, ins struct {
 	tx := db.Transactions{
 		TxId:           ins.Tx.ID.String(),
 		BlockHash:      "",
-		Amount:         int64(ins.Amount),
-		Version:        int64(ins.Tx.Version),
-		SerializedSize: int64(ins.Tx.SerializedSize),
-		TimeRange:      int64(ins.Tx.TimeRange),
+		Amount:         ins.Amount,
+		SerializedSize: ins.Tx.SerializedSize,
+		TimeRange:      ins.Tx.TimeRange,
 	}
 	if _, err := db.Engine.Insert(&tx); err != nil {
 		log.Errorf("Failed write tx amount to db, %v, %v", err, &ins.Tx.ID)

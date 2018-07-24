@@ -199,8 +199,8 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 		tx := db.Transactions{}
 		has, err := db.Engine.Where("tx_id = ?", txID).Get(&tx)
 		if err != nil || !has {
-			log.Errorf("list-transactions: %v", err)
-			continue
+			log.Errorf("list-transactions: can't find %v from mysql, %v", txID, err)
+			// continue
 		}
 
 		blockHash := txIDsMap[txID]

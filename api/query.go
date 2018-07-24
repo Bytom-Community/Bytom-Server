@@ -109,8 +109,8 @@ type TxResponse struct {
 func (a *API) listTransactions(ctx context.Context, filter struct {
 	Address    string `json:"address"`
 	AssetID    string `json:"asset_id"`
-	PageNumber int64  `json:"page_number"`
-	PageSize   int64  `json:"page_size"`
+	PageNumber int64  `json:"page_number,omitempty"`
+	PageSize   int64  `json:"page_size,omitempty"`
 }) Response {
 
 	transactions := []*TxResponse{}
@@ -225,8 +225,16 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 }
 
 func getPagination(total, pageNumber, pageSize int64) (int64, int64, error) {
-	if pageNumber <= 0 || pageSize <= 0 {
+	if pageNumber < 0 || pageSize < 0 {
 		return 0, 0, errors.New("page params out of range")
+	}
+
+	if pageNumber == 0 {
+		pageNumber = 1
+	}
+
+	if pageSize == 0 {
+		pageSize = 10
 	}
 
 	start := (pageNumber - 1) * pageSize

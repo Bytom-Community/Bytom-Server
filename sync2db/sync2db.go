@@ -65,12 +65,13 @@ func (s *Sync2DB) runSync() {
 			cmn.Exit(cmn.Fmt("Failed to MarshalText from hash :%v", err))
 		}
 		exist, err := db.Engine.Exist(&db.Block{
-			Hash: string(blockID),
+			Hash:   string(blockID),
+			Height: block.Height,
 		})
 		if err != nil {
 			cmn.Exit(cmn.Fmt("Failed to get block exist from db: %v", err))
 		}
-		log.Info("current sync2db block id:", string(blockID))
+		log.Infof("current sync2db block id:%v, height:%v", string(blockID), block.Height)
 		if !exist {
 			var txIds []string
 			for _, v := range block.Transactions {

@@ -54,16 +54,17 @@ func (s *Sync2DB) runSync() {
 	log.Infof("Sync2DB running sync to db， current height:%v", height)
 
 	for i := height; i > 0; i-- {
-		if skip {
-			skip = false
-			continue
-		}
 		block, err := s.store.GetBlock(bcHash)
 		if err != nil {
 			cmn.Exit(cmn.Fmt("Failed to get block from store: %v", err))
 		}
 		if existCount >= 3 {
 			return
+		}
+		if skip {
+			skip = false
+			bcHash = &block.PreviousBlockHash
+			continue
 		}
 		blockID, err := block.Hash().MarshalText()
 		if err != nil {

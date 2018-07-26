@@ -50,9 +50,14 @@ func (s *Sync2DB) runSync() {
 	bcHash := s.chain.BestBlockHash()
 	height := s.chain.BestBlockHeight()
 	existCount := 0
+	skip := true // skip the first block
 	log.Infof("Sync2DB running sync to db， current height:%v", height)
 
 	for i := height; i > 0; i-- {
+		if skip {
+			skip = false
+			continue
+		}
 		block, err := s.store.GetBlock(bcHash)
 		if err != nil {
 			cmn.Exit(cmn.Fmt("Failed to get block from store: %v", err))

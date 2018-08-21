@@ -243,7 +243,7 @@ func getPagination(total, pageNumber, pageSize int64) (int64, int64, error) {
 		return 0, 0, errors.New("page params out of range")
 	}
 	if end >= total {
-		end = total - 1
+		end = total
 	}
 
 	return start, end, nil

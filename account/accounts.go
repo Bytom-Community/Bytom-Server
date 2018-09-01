@@ -175,6 +175,37 @@ func (m *Manager) Create(ctx context.Context, xpubs []chainkd.XPub, quorum int, 
 	return account, nil
 }
 
+// SyncAccount sync account info from mobile wallet
+func (m *Manager) SyncAccount(alias string, ID string, xpubs []chainkd.XPub, quorum int, keyIndex uint64) error {
+	m.accountMu.Lock()
+	defer m.accountMu.Unlock()
+
+	normalizedAlias := strings.ToLower(strings.TrimSpace(alias))
+	if existed := m.db.Get(aliasKey(normalizedAlias)); existed != nil {
+		return ErrDuplicateAlias
+	}
+
+	signer := &signers.Signer{
+		Type:     "account",
+		XPubs:    xpubs,
+		Quorum:   quorum,
+		KeyIndex: keyIndex,
+	}
+
+	account := &Account{Signer: signer, ID: ID, Alias: normalizedAlias}
+	rawAccount, err := json.Marshal(account)
+	if err != nil {
+		return ErrMarshalAccount
+	}
+
+	accountID := Key(ID)
+	storeBatch := m.db.NewBatch()
+	storeBatch.Set(accountID, rawAccount)
+	storeBatch.Set(aliasKey(normalizedAlias), []byte(ID))
+	storeBatch.Write()
+	return nil
+}
+
 // FindByAlias retrieves an account's Signer record by its alias
 func (m *Manager) FindByAlias(ctx context.Context, alias string) (*Account, error) {
 	m.cacheMu.Lock()

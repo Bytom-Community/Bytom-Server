@@ -29,6 +29,21 @@ func (a *API) createAccount(ctx context.Context, ins struct {
 	return NewSuccessResponse(annotatedAccount)
 }
 
+// POST /sync-account
+func (a *API) syncAccount(ctx context.Context, ins struct {
+	Alias     string         `json:"alias"`
+	AccountID string         `json:"account_id"`
+	RootXPubs []chainkd.XPub `json:"root_xpubs"`
+	Quorum    int            `json:"quorum"`
+	KeyIndex  uint64         `json:"key_index"`
+}) Response {
+	err := a.wallet.AccountMgr.SyncAccount(ins.Alias, ins.AccountID, ins.RootXPubs, ins.Quorum, ins.KeyIndex)
+	if err != nil {
+		return NewErrorResponse(err)
+	}
+	return NewSuccessResponse(nil)
+}
+
 // AccountInfo
 type AccountInfo struct {
 	Info string `json:"account_info"`

@@ -295,6 +295,13 @@ func (m *Manager) createAddress(ctx context.Context, account *Account, change bo
 	return cp, nil
 }
 
+func (m *Manager) SyncAddress(ctx context.Context, cp *CtrlProgram) error {
+	if err := m.insertAccountControlProgram(ctx, cp); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *Manager) createP2PKH(ctx context.Context, account *Account, change bool) (*CtrlProgram, error) {
 	idx := m.getNextContractIndex(account.ID)
 	path := signers.Path(account.Signer, signers.AccountKeySpace, idx)

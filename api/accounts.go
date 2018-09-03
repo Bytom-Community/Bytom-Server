@@ -57,6 +57,26 @@ func (a *API) deleteAccount(ctx context.Context, in AccountInfo) Response {
 	return NewSuccessResponse(nil)
 }
 
+func (a *API) syncAddress(ctx context.Context, ins struct {
+	AccountID      string `json:"account_id"`
+	Address        string `json:"address"`
+	KeyIndex       uint64 `json:"key_index"`
+	ControlProgram string `json:"control_program"`
+}) Response {
+	cp := &account.CtrlProgram{
+		AccountID:      ins.AccountID,
+		Address:        ins.Address,
+		KeyIndex:       ins.KeyIndex,
+		ControlProgram: []byte(ins.ControlProgram),
+		Change:         false,
+	}
+	err := a.wallet.AccountMgr.SyncAddress(ctx, cp)
+	if err != nil {
+		return NewErrorResponse(err)
+	}
+	return NewSuccessResponse(nil)
+}
+
 type validateAddressResp struct {
 	Valid   bool `json:"valid"`
 	IsLocal bool `json:"is_local"`

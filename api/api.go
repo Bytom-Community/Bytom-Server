@@ -177,6 +177,7 @@ func (a *API) buildHandler() {
 		m.Handle("/create-account-receiver", jsonHandler(a.createAccountReceiver))
 		m.Handle("/list-addresses", jsonHandler(a.listAddresses))
 		m.Handle("/validate-address", jsonHandler(a.validateAddress))
+		m.Handle("/sync-address", jsonHandler(a.syncAddress))
 
 		m.Handle("/create-asset", jsonHandler(a.createAsset))
 		m.Handle("/update-asset-alias", jsonHandler(a.updateAssetAlias))

@@ -97,3 +97,22 @@ curl -X POST http://39.104.187.161/estimate-transaction-gas -d '
 
 Return:
 {"status":"success","data":{"total_neu":2000000,"storage_neu":555600,"vm_neu":1419000}}
+
+4. 同步地址信息
+curl -X POST http://127.0.0.1:9888/sync-address -d '
+{
+    "account_id": "0ICUU9TIG0A02",
+    "address": "bm1qjvnw8463qvendnerln72j7whvv3xmvhg5ruawk",
+    "key_index": 1,
+    "control_program": "00149326e3d751033336cf23fcfca979d763226db2e8"
+}'
+
+5. 同步账号信息
+curl -X POST http://127.0.0.1:9888/sync-account -d '
+{
+    "alias": "shenpengtest",
+    "account_id": "0ICUU9TIG0A02",
+    "root_xpubs": ["e4ddb8e765ea3c0c2b51746128a0dbc8a24d618483567c380aaac97ad4e59292d0d16a08e1bb15b10f333b51a8ddaa089b12dc0d8a21f33992924277855e84b7"],
+    "quorum": 1,
+    "key_index": 1
+}'

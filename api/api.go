@@ -199,11 +199,13 @@ func (a *API) buildHandler() {
 		m.Handle("/create-account", jsonHandler(a.createAccount))
 		m.Handle("/list-accounts", jsonHandler(a.listAccounts))
 		m.Handle("/delete-account", jsonHandler(a.deleteAccount))
+		m.Handle("/sync-account", jsonHandler(a.syncAccount))
 
 		m.Handle("/create-account-receiver", jsonHandler(a.createAccountReceiver))
 		m.Handle("/list-addresses", jsonHandler(a.listAddresses))
 		m.Handle("/validate-address", jsonHandler(a.validateAddress))
 		m.Handle("/list-pubkeys", jsonHandler(a.listPubKeys))
+		m.Handle("/sync-address", jsonHandler(a.syncAddress))
 
 		m.Handle("/get-mining-address", jsonHandler(a.getMiningAddress))
 		m.Handle("/set-mining-address", jsonHandler(a.setMiningAddress))
@@ -215,6 +217,7 @@ func (a *API) buildHandler() {
 		m.Handle("/update-asset-alias", jsonHandler(a.updateAssetAlias))
 		m.Handle("/get-asset", jsonHandler(a.getAsset))
 		m.Handle("/list-assets", jsonHandler(a.listAssets))
+		m.Handle("/get-assets", jsonHandler(a.getAssets))
 
 		m.Handle("/create-key", jsonHandler(a.pseudohsmCreateKey))
 		m.Handle("/list-keys", jsonHandler(a.pseudohsmListKeys))
@@ -228,6 +231,7 @@ func (a *API) buildHandler() {
 
 		m.Handle("/get-transaction", jsonHandler(a.getTransaction))
 		m.Handle("/list-transactions", jsonHandler(a.listTransactions))
+		m.Handle("/get-transactions", jsonHandler(a.getTransactions))
 
 		m.Handle("/list-balances", jsonHandler(a.listBalances))
 		m.Handle("/list-unspent-outputs", jsonHandler(a.listUnspentOutputs))

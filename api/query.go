@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"sort"
 
 	log "github.com/sirupsen/logrus"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/bytom/blockchain/signers"
 	"github.com/bytom/consensus"
 	"github.com/bytom/crypto/ed25519/chainkd"
+	"github.com/bytom/db"
 	chainjson "github.com/bytom/encoding/json"
 	"github.com/bytom/errors"
 	"github.com/bytom/protocol/bc"
@@ -69,6 +71,25 @@ func (a *API) listAssets(ctx context.Context, filter struct {
 		return NewErrorResponse(err)
 	}
 
+	return NewSuccessResponse(assets)
+}
+
+// POST /get-assets
+func (a *API) getAssets(ctx context.Context, filter struct {
+	Address string `json:"address"`
+}) Response {
+	assets := make(map[string]uint64)
+	var outputs []db.TxOutputs
+
+	err := db.Engine.Select("asset_id, sum(amount) as amount").Where("address = ?", filter.Address).GroupBy("asset_id").Find(&outputs)
+	if err != nil {
+		log.Errorf("listAssets: %v", err)
+		return NewErrorResponse(err)
+	}
+
+	for i := range outputs {
+		assets[outputs[i].AssetId] = outputs[i].Amount
+	}
 	return NewSuccessResponse(assets)
 }
 
@@ -144,6 +165,186 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 	}
 	start, end := getPageRange(len(transactions), filter.From, filter.Count)
 	return NewSuccessResponse(transactions[start:end])
+}
+
+// POST /get-transactions
+func (a *API) getTransactions(ctx context.Context, filter struct {
+	Address    string `json:"address"`
+	AssetID    string `json:"asset_id"`
+	PageNumber int64  `json:"page_number,omitempty"`
+	PageSize   int64  `json:"page_size,omitempty"`
+}) Response {
+	transactions := []*TxResponse{}
+	blocks := []*db.Block{}
+	blockHashs := []string{}
+	blocksMap := map[string]*db.Block{}
+	txIDsMap := map[string]string{} // key:tx_id  value:block_hash
+	txIDs := []string{}
+	var err error
+	var bestBlockHeight uint64
+
+	if bestBlockHeight, err = getBestBlockHeight(); err != nil {
+		log.Errorf("list-transactions: %v", err)
+		return NewErrorResponse(errors.New("list-transaction err"))
+	}
+
+	if txIDsMap, txIDs, err = getTxIDAndBlockHash(filter.Address, filter.AssetID); err != nil {
+		log.Errorf("list-transactions: %v", err)
+		return NewErrorResponse(errors.New("list-transaction err"))
+	}
+
+	if len(txIDs) == 0 {
+		log.Infof("list-transactions: no transactions with address: %v, asset_id: %v", filter.Address, filter.AssetID)
+		return NewSuccessResponse(transactions)
+	}
+
+	// 分页
+	sort.Strings(txIDs)
+	total := int64(len(txIDs))
+	start, end, err := getPagination(total, filter.PageNumber, filter.PageSize)
+	if err != nil {
+		log.Errorf("list-transactions: %v", err)
+		return NewErrorResponse(err)
+	}
+	returnTxIDs := txIDs[start:end]
+
+	// 获取相关的block
+	for i := range returnTxIDs {
+		blocksMap[txIDsMap[returnTxIDs[i]]] = nil
+	}
+	for k := range blocksMap {
+		blockHashs = append(blockHashs, k)
+	}
+
+	if err = db.Engine.In("hash", blockHashs).Find(&blocks); err != nil {
+		log.Errorf("list-transactions: %v", err)
+		return NewErrorResponse(errors.New("list-transaction err"))
+	}
+	for i := range blocks {
+		blocksMap[blocks[i].Hash] = blocks[i]
+	}
+
+	// 获取结果
+	for _, txID := range returnTxIDs {
+		var op string
+		var inAmount, outAmount uint64
+		var inputs []*db.TxInputs
+		var outputs []*db.TxOutputs
+
+		// FIXME: 查询需优化
+		if err = db.Engine.Where("tx_id = ?", txID).Find(&inputs); err != nil {
+			log.Errorf("list-transactions: %v", err)
+			continue
+		}
+
+		if err = db.Engine.Where("tx_id = ?", txID).Find(&outputs); err != nil {
+			log.Errorf("list-transactions: %v", err)
+			continue
+		}
+
+		for i := range inputs {
+			inAmount += inputs[i].Amount
+			if inputs[i].Address == filter.Address {
+				op = "send"
+			}
+		}
+
+		for i := range outputs {
+			outAmount += outputs[i].Amount
+			// 排除找零地址
+			if outputs[i].Address == filter.Address && op == "" {
+				op = "receive"
+			}
+		}
+
+		tx := db.Transactions{}
+		has, err := db.Engine.Where("tx_id = ?", txID).Get(&tx)
+		if err != nil || !has {
+			log.Errorf("list-transactions: can't find %v from mysql, %v", txID, err)
+			// continue
+		}
+
+		blockHash := txIDsMap[txID]
+		txResp := &TxResponse{
+			ID:                     txID,
+			Timestamp:              blocksMap[blockHash].Timestamp,
+			BlockID:                blockHash,
+			BlockHeight:            blocksMap[blockHash].Height,
+			BlockTransactionsCount: uint32(blocksMap[blockHash].TxCount),
+			Confirmation:           bestBlockHeight - blocksMap[blockHash].Height,
+			StatusFail:             false,
+			Inputs:                 inputs,
+			Outputs:                outputs,
+			Op:                     op,
+			Fee:                    inAmount - outAmount, // 手续费
+			Amount:                 tx.Amount,
+		}
+		transactions = append(transactions, txResp)
+	}
+
+	return NewSuccessResponse(transactions)
+}
+
+func getPagination(total, pageNumber, pageSize int64) (int64, int64, error) {
+	if pageNumber < 0 || pageSize < 0 {
+		return 0, 0, errors.New("page params out of range")
+	}
+
+	if pageNumber == 0 {
+		pageNumber = 1
+	}
+
+	if pageSize == 0 {
+		pageSize = 10
+	}
+
+	start := (pageNumber - 1) * pageSize
+	end := start + pageSize
+	if start >= total {
+		return 0, 0, errors.New("page params out of range")
+	}
+	if end >= total {
+		end = total
+	}
+
+	return start, end, nil
+}
+
+func getTxIDAndBlockHash(address, assetID string) (map[string]string, []string, error) {
+	txIDsMap := map[string]string{}
+	txIDs := []string{}
+	var err error
+
+	sql := `
+		select tx_id, block_hash from tx_inputs where address = ? and asset_id = ? 
+		union
+		select tx_id, block_hash from tx_outputs where address = ? and asset_id = ?
+	`
+	result, err := db.Engine.Query(sql, address, assetID, address, assetID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	for _, row := range result {
+		txID := string(row["tx_id"])
+		blockHash := string(row["block_hash"])
+		if _, ok := txIDsMap[txID]; !ok {
+			txIDsMap[txID] = blockHash
+			txIDs = append(txIDs, txID)
+		}
+	}
+
+	return txIDsMap, txIDs, nil
+}
+
+func getBestBlockHeight() (uint64, error) {
+	var heightBlcok db.Block
+	if _, err := db.Engine.Select("max(height) as height").Get(&heightBlcok); err != nil {
+		log.Errorf("list-transactions: %v", err)
+		return 0, err
+	}
+
+	return heightBlcok.Height, nil
 }
 
 // POST /get-unconfirmed-transaction

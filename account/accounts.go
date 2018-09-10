@@ -145,6 +145,37 @@ func (m *Manager) Create(xpubs []chainkd.XPub, quorum int, alias string) (*Accou
 	return account, nil
 }
 
+// SyncAccount sync account info from mobile wallet
+func (m *Manager) SyncAccount(alias string, ID string, xpubs []chainkd.XPub, quorum int, keyIndex uint64) error {
+	m.accountMu.Lock()
+	defer m.accountMu.Unlock()
+
+	normalizedAlias := strings.ToLower(strings.TrimSpace(alias))
+	if existed := m.db.Get(aliasKey(normalizedAlias)); existed != nil {
+		return ErrDuplicateAlias
+	}
+
+	signer := &signers.Signer{
+		Type:     "account",
+		XPubs:    xpubs,
+		Quorum:   quorum,
+		KeyIndex: keyIndex,
+	}
+
+	account := &Account{Signer: signer, ID: ID, Alias: normalizedAlias}
+	rawAccount, err := json.Marshal(account)
+	if err != nil {
+		return ErrMarshalAccount
+	}
+
+	accountID := Key(ID)
+	storeBatch := m.db.NewBatch()
+	storeBatch.Set(accountID, rawAccount)
+	storeBatch.Set(aliasKey(normalizedAlias), []byte(ID))
+	storeBatch.Write()
+	return nil
+}
+
 // CreateAddress generate an address for the select account
 func (m *Manager) CreateAddress(accountID string, change bool) (cp *CtrlProgram, err error) {
 	account, err := m.FindByID(accountID)
@@ -428,6 +459,13 @@ func (m *Manager) createAddress(account *Account, change bool) (cp *CtrlProgram,
 		return nil, err
 	}
 	return cp, m.insertControlPrograms(cp)
+}
+
+func (m *Manager) SyncAddress(cp *CtrlProgram) error {
+	if err := m.insertControlPrograms(cp); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (m *Manager) createP2PKH(account *Account, change bool) (*CtrlProgram, error) {

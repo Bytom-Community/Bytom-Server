@@ -167,6 +167,22 @@ func (a *API) listTransactions(ctx context.Context, filter struct {
 	return NewSuccessResponse(transactions[start:end])
 }
 
+// TxResponse for list-transactions response
+type TxResponse struct {
+	ID                     string          `json:"id"`
+	Timestamp              uint64          `json:"timestamp"`
+	BlockID                string          `json:"block_id"`
+	BlockHeight            uint64          `json:"block_height"`
+	BlockTransactionsCount uint32          `json:"block_transaction_count"`
+	Confirmation           uint64          `json:"confirmation"`
+	StatusFail             bool            `json:"status_fail"`
+	Inputs                 []*db.TxInputs  `json:"inputs"`
+	Outputs                []*db.TxOutputs `json:"outputs"`
+	Op                     string          `json:"op"`
+	Fee                    uint64          `json:"fee"`
+	Amount                 uint64          `json:"amount"`
+}
+
 // POST /get-transactions
 func (a *API) getTransactions(ctx context.Context, filter struct {
 	Address    string `json:"address"`

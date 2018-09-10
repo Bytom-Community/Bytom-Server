@@ -9,6 +9,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bytom/db"
+	"github.com/bytom/sync2db"
+
 	"github.com/prometheus/prometheus/util/flock"
 	log "github.com/sirupsen/logrus"
 	cmn "github.com/tendermint/tmlibs/common"
@@ -150,7 +153,7 @@ func NewNode(config *cfg.Config) *Node {
 			s.Run()
 		}(syc)
 	}
-	
+
 	node := &Node{
 		config:       config,
 		syncManager:  syncManager,

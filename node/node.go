@@ -56,6 +56,7 @@ type Node struct {
 	cpuMiner     *cpuminer.CPUMiner
 	miningPool   *miningpool.MiningPool
 	miningEnable bool
+	sync2db      *sync2db.Sync2DB
 }
 
 func NewNode(config *cfg.Config) *Node {
@@ -134,6 +135,22 @@ func NewNode(config *cfg.Config) *Node {
 		}()
 	}
 
+	// init db
+	err = db.NewDB(config.MysqlAddr, config.MysqlUser, config.MysqlPass, config.MysqlPort, config.MysqlDBName)
+	if err != nil {
+		cmn.Exit(cmn.Fmt("initialize db failed: %v", err))
+	}
+	if !db.IsInit() {
+		cmn.Exit(cmn.Fmt("initialize db failed"))
+	}
+	syc := new(sync2db.Sync2DB)
+	if config.Sync2DB {
+		syc = sync2db.NewSync2DB(store, chain, wallet)
+		go func(s *sync2db.Sync2DB) {
+			s.Run()
+		}(syc)
+	}
+	
 	node := &Node{
 		config:       config,
 		syncManager:  syncManager,
@@ -142,6 +159,7 @@ func NewNode(config *cfg.Config) *Node {
 		chain:        chain,
 		txfeed:       txFeed,
 		miningEnable: config.Mining,
+		sync2db:      syc,
 	}
 
 	node.cpuMiner = cpuminer.NewCPUMiner(chain, accounts, txPool, newBlockCh)

@@ -6,8 +6,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"github.com/bytom/node"
 	"strings"
+
+	"github.com/bytom/node"
 )
 
 var runNodeCmd = &cobra.Command{
@@ -19,6 +20,7 @@ var runNodeCmd = &cobra.Command{
 func init() {
 	runNodeCmd.Flags().String("prof_laddr", config.ProfListenAddress, "Use http to profile bytomd programs")
 	runNodeCmd.Flags().Bool("mining", config.Mining, "Enable mining")
+	runNodeCmd.Flags().Bool("sync_to_db", config.Sync2DB, "Enable sync to db")
 
 	runNodeCmd.Flags().Bool("simd.enable", config.Simd.Enable, "Enable SIMD mechan for tensority")
 

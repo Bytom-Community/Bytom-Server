@@ -72,6 +72,8 @@ type BaseConfig struct {
 
 	Mining bool `mapstructure:"mining"`
 
+	Sync2DB bool `mapstructure:"sync_to_db"`
+
 	FilterPeers bool `mapstructure:"filter_peers"` // false
 
 	// What indexer to use for transactions
@@ -94,6 +96,13 @@ type BaseConfig struct {
 	VaultMode bool `mapstructure:"vault_mode"`
 
 	Time time.Time
+
+	// db
+	MysqlAddr   string `mapstructure:"mysql_addr"`
+	MysqlPort   string `mapstructure:"mysql_port"`
+	MysqlUser   string `mapstructure:"mysql_user"`
+	MysqlPass   string `mapstructure:"mysql_pass"`
+	MysqlDBName string `mapstructure:"mysql_name"`
 
 	// log file name
 	LogFile string `mapstructure:"log_file"`
